@@ -1,5 +1,2 @@
 [tool.isort]
 profile = "black"
-
-[tool.mypy-spotlight.*]
-ignore_missing_imports = True
