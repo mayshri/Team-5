@@ -9,4 +9,6 @@ tqdm
 scikit-learn
 kafka
 git+https://github.com/maciejkula/spotlight.git
-Flask
+Flask==2.2.2
+requests
+json
