@@ -1,6 +1,5 @@
-
-from kafka import KafkaConsumer
 import csv
+from kafka import KafkaConsumer
 
 server = 'fall2022-comp585.cs.mcgill.ca:9092'
 topic = 'movielog5'
