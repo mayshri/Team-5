@@ -1,4 +1,5 @@
 import csv
+
 from kafka import KafkaConsumer
 
 server = 'fall2022-comp585.cs.mcgill.ca:9092'
