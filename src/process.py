@@ -12,8 +12,8 @@ class ProcessDumps:
     """
     Usage:
     ```
-    >>> from src.process import ProcessDumps, DATAFOLDER
-    >>> ProcessDumps.process_new_dump("kafka-dump.csv")
+    >>> from src.process import ProcessDumps
+    >>> ProcessDumps.process_new_dump("data/kafka-dump.csv")
     ```
     """
 
