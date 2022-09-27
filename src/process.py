@@ -48,7 +48,9 @@ class ProcessDumps:
 
         # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
-        df = df.drop(labels=["request"], axis=1)
+        df = df.drop(labels=["request"], axis=1).drop_duplicates(
+            subset=["user_id", "movie_id"]
+        )
 
         return df
 
