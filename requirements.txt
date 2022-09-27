@@ -11,4 +11,3 @@ kafka
 git+https://github.com/maciejkula/spotlight.git
 Flask==2.2.2
 requests
-json
