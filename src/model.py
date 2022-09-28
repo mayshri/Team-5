@@ -18,8 +18,8 @@ INTERACTIONS = DATAFOLDER / "interactions.csv"
 
 class Model:
     @staticmethod
-    def train(data: Path):
-        data = pd.read_csv(data)
+    def train(data_path: Path):
+        data = pd.read_csv(data_path)
 
         data["user_id"] = data["user_id"].astype("int32")
 
