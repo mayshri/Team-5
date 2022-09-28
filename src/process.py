@@ -1,8 +1,8 @@
+import datetime
+import time
 from pathlib import Path
 from typing import Union
 
-import time
-import datetime
 import pandas as pd
 
 DATAFOLDER = Path(__file__).parents[1] / "data"
@@ -40,12 +40,12 @@ class ProcessDumps:
 
     @staticmethod
     def try_parsing_date(text):
-        for fmt in ('%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M'):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
             try:
                 return datetime.datetime.strptime(text, fmt)
             except ValueError:
                 pass
-        raise ValueError('no valid date format found')
+        raise ValueError("no valid date format found")
 
     @staticmethod
     def raw_to_interactions(cls, raw_dump: Path) -> pd.DataFrame:
@@ -59,7 +59,9 @@ class ProcessDumps:
 
         # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
-        df["timestamp"] = df["timestamp"].map(lambda x: time.mktime(cls.try_parsing_date(x.replace("b'", "")).timetuple()))
+        df["timestamp"] = df["timestamp"].map(
+            lambda x: time.mktime(cls.try_parsing_date(x.replace("b'", "")).timetuple())
+        )
         df = df.drop(labels=["request"], axis=1).drop_duplicates(
             subset=["user_id", "movie_id"]
         )

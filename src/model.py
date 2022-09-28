@@ -1,13 +1,12 @@
 from pathlib import Path
 
-import torch
-import pandas as pd
 import numpy as np
-
-from spotlight.sequence.implicit import ImplicitSequenceModel
-from spotlight.interactions import Interactions
+import pandas as pd
+import torch
 from spotlight.cross_validation import random_train_test_split
 from spotlight.evaluation import sequence_mrr_score
+from spotlight.interactions import Interactions
+from spotlight.sequence.implicit import ImplicitSequenceModel
 
 MODELSFOLDER = Path(__file__).parents[1] / "models"
 MODEL = MODELSFOLDER / "model.pt"
@@ -16,29 +15,29 @@ MOVIEMAP = MODELSFOLDER / "movie_map.csv"
 DATAFOLDER = Path(__file__).parents[1] / "data"
 INTERACTIONS = DATAFOLDER / "interactions.csv"
 
-class Model:
 
+class Model:
     @staticmethod
     def train(data: Path):
         data = pd.read_csv(data)
 
-        data['user_id'] = data['user_id'].astype('int32')
+        data["user_id"] = data["user_id"].astype("int32")
 
-        movie_map_ids = pd.factorize(data['movie_id'])[0]
+        movie_map_ids = pd.factorize(data["movie_id"])[0]
         movie_map_ids += 1
         data = data.assign(movie_map_id=movie_map_ids)
 
         dataset = Interactions(
-            num_items=data['movie_map_id'].max()+1,
-            user_ids=data['user_id'].values,
-            item_ids=data['movie_map_id'].values,
-            timestamps=data['timestamp'].values
+            num_items=data["movie_map_id"].max() + 1,
+            user_ids=data["user_id"].values,
+            item_ids=data["movie_map_id"].values,
+            timestamps=data["timestamp"].values,
         )
 
         model = ImplicitSequenceModel(
             n_iter=10,
-            representation='cnn',
-            loss='bpr',
+            representation="cnn",
+            loss="bpr",
         )
 
         train, test = random_train_test_split(dataset)
@@ -56,24 +55,28 @@ class Model:
         torch.save(model, MODEL)
 
         # Save movie map
-        pd.DataFrame({'movie_id': data['movie_id'], 'movie_map_id': data['movie_map_id']}).drop_duplicates().to_csv(MOVIEMAP, index=False)
-        
+        pd.DataFrame(
+            {"movie_id": data["movie_id"], "movie_map_id": data["movie_map_id"]}
+        ).drop_duplicates().to_csv(MOVIEMAP, index=False)
+
         return model
 
     @staticmethod
     def map_movie_id(movie_id):
         movie_map = pd.read_csv(MOVIEMAP)
-        return movie_map[movie_map['movie_id'] == movie_id]['movie_map_id'].values[0]
+        return movie_map[movie_map["movie_id"] == movie_id]["movie_map_id"].values[0]
 
     @staticmethod
     def get_movie_id(mapped_movie_id):
         movie_map = pd.read_csv(MOVIEMAP)
-        return movie_map[movie_map['movie_map_id'] == mapped_movie_id]['movie_id'].values[0]
+        return movie_map[movie_map["movie_map_id"] == mapped_movie_id][
+            "movie_id"
+        ].values[0]
 
     @staticmethod
     def get_user_movies_watched(user_id):
         data = pd.read_csv(INTERACTIONS)
-        return data[data['user_id'] == user_id]['movie_id'].values
+        return data[data["user_id"] == user_id]["movie_id"].values
 
     @staticmethod
     def predict(cls, movies, nbr_movies=10):
