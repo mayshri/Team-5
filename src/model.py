@@ -76,10 +76,16 @@ class Model:
     @staticmethod
     def get_user_movies_watched(user_id):
         data = pd.read_csv(INTERACTIONS)
+
         return data[data["user_id"] == user_id]["movie_id"].values
 
     @staticmethod
     def predict(cls, movies, nbr_movies=10):
+
+        if len(movies)==0:
+            data = pd.read_csv(INTERACTIONS)
+            return list(data['movie_id'].value_counts().head(20).index)
+        
         model = torch.load(MODEL)
         movie_ids = [cls.map_movie_id(movie) for movie in movies]
 
