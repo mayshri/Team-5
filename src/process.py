@@ -1,3 +1,5 @@
+import datetime
+import time
 from pathlib import Path
 from typing import Union
 
@@ -37,7 +39,16 @@ class ProcessDumps:
         return df
 
     @staticmethod
-    def raw_to_interactions(raw_dump: Path) -> pd.DataFrame:
+    def try_parsing_date(text):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
+            try:
+                return datetime.datetime.strptime(text, fmt)
+            except ValueError:
+                pass
+        raise ValueError("no valid date format found")
+
+    @staticmethod
+    def raw_to_interactions(cls, raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
         data = dump_df[6]
         df = data.str.split(",", 2, expand=True)
@@ -48,6 +59,9 @@ class ProcessDumps:
 
         # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
+        df["timestamp"] = df["timestamp"].map(
+            lambda x: time.mktime(cls.try_parsing_date(x.replace("b'", "")).timetuple())
+        )
         df = df.drop(labels=["request"], axis=1).drop_duplicates(
             subset=["user_id", "movie_id"]
         )
@@ -57,12 +71,12 @@ class ProcessDumps:
     @classmethod
     def process_new_dump(cls, raw_dump: Union[Path, str]) -> None:
 
-        new_interactions = cls.raw_to_interactions(Path(raw_dump))
+        new_interactions = cls.raw_to_interactions(cls, Path(raw_dump))
 
         if not INTERACTIONS.exists():
             new_interactions.to_csv(INTERACTIONS, index=False)
-
-        combined_ratings = pd.concat(
-            [new_interactions, pd.read_csv(INTERACTIONS)]
-        ).drop_duplicates()
-        combined_ratings.to_csv(INTERACTIONS, index=False)
+        else:
+            combined_ratings = pd.concat(
+                [new_interactions, pd.read_csv(INTERACTIONS)]
+            ).drop_duplicates()
+            combined_ratings.to_csv(INTERACTIONS, index=False)
