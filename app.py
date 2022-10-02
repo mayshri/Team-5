@@ -1,9 +1,9 @@
 from flask import Flask
 from src.model import Model
-import json
 import requests
-app = Flask(__name__)
+import json
 
+app = Flask(__name__)
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
