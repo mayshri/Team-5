@@ -47,7 +47,7 @@ class ProcessDumps:
                 pass
         raise ValueError("no valid date format found")
 
-    @staticmethod
+    @classmethod
     def raw_to_interactions(cls, raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
         data = dump_df[6]
@@ -71,7 +71,7 @@ class ProcessDumps:
     @classmethod
     def process_new_dump(cls, raw_dump: Union[Path, str]) -> None:
 
-        new_interactions = cls.raw_to_interactions(cls, Path(raw_dump))
+        new_interactions = cls.raw_to_interactions(Path(raw_dump))
 
         if not INTERACTIONS.exists():
             new_interactions.to_csv(INTERACTIONS, index=False)
