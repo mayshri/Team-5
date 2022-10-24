@@ -5,6 +5,7 @@ from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
 from spotlight.sequence.implicit import ImplicitSequenceModel
+from kafka import KafkaConsumer
 
 from . import config
 from .utils import seed_everything
@@ -60,6 +61,20 @@ class Model:
         self.top_20 = list(self.interactions["movie_id"].value_counts().head(20).index)
         self.users = set(self.interactions["user_id"].unique())
 
+        self.setup_online_testing()
+
+    def parse_entry(self, entry):
+        print(entry)
+
+    def setup_online_testing(self):
+        server = "fall2022-comp585.cs.mcgill.ca:9092"
+        topic = "movielog5"
+
+        consumer = KafkaConsumer(topic, bootstrap_servers=[server], api_version=(0, 11, 5))
+
+        for message in consumer:
+            self.parse_entry(message)
+
     def load_model(self):
         self.model = torch.load(config.MODEL)
 
@@ -90,7 +105,10 @@ class Model:
         pred = self.model.predict(sequences=np.array(movie_ids))
         indices = np.argpartition(pred, -nbr_movies)[-nbr_movies:]
         best_movie_id_indices = indices[np.argsort(pred[indices])]
-        return [self.get_movie_id(movie) for movie in best_movie_id_indices]
+
+        movies_recommended = [self.get_movie_id(movie) for movie in best_movie_id_indices]
+        self.setup_online_testing(movies_recommended)
+        return movies_recommended
 
     def recommend(self, user_id):
         if user_id not in self.users:

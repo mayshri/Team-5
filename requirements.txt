@@ -8,6 +8,6 @@ torch
 tqdm
 scikit-learn
 kafka
-git+https://github.com/maciejkula/spotlight.git
+git+https://github.com/maciejkula/spotlight.git#egg=spotlight
 Flask==2.2.2
 requests
