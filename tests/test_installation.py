@@ -1,4 +1,3 @@
-from multiprocessing.managers import ValueProxy
 from unittest import TestCase
 
 from spotlight.cross_validation import user_based_train_test_split
