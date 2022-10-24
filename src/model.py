@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import torch
-from spotlight.cross_validation import random_train_test_split
+from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
 from spotlight.sequence.implicit import ImplicitSequenceModel
@@ -11,6 +11,25 @@ from .utils import seed_everything
 
 
 class Model:
+
+    """
+    Train the model using the following script:
+    ```python
+    model = Model()
+    train, test = model.load_interactions()
+    model.fit(train)
+    mrr_scores = model.eval(test)
+    ```
+
+    And you can evaluate a trained model using the following script:
+    ```python
+    model = Model()
+    model.load_model()
+    train, test = model.load_interactions()
+    model.eval(test)
+    ```
+    """
+
     def __init__(self):
 
         seed_everything(config.SEED)
@@ -23,13 +42,20 @@ class Model:
         self.interactions = pd.read_csv(config.INTERACTIONS)
         self.interactions["user_id"] = self.interactions["user_id"].astype("int32")
 
+        movie_map_ids = pd.factorize(self.interactions["movie_id"])[0]
+        movie_map_ids += 1
+        self.interactions = self.interactions.assign(movie_map_id=movie_map_ids)
+
         try:
             self.movie_map = pd.read_csv(config.MOVIEMAP)
         except FileNotFoundError:
-            print(
-                "No movie map yet! The model must be trained first with model.train()"
-            )
-            self.movie_map = None
+            self.movie_map = pd.DataFrame(
+                {
+                    "movie_id": self.interactions["movie_id"],
+                    "movie_map_id": self.interactions["movie_map_id"],
+                }
+            ).drop_duplicates()
+            self.movie_map.to_csv(config.MOVIEMAP, index=False)
 
         self.top_20 = list(self.interactions["movie_id"].value_counts().head(20).index)
         self.users = set(self.interactions["user_id"].unique())
@@ -37,42 +63,27 @@ class Model:
     def load_model(self):
         self.model = torch.load(config.MODEL)
 
-    def train(self):
-        movie_map_ids = pd.factorize(self.interactions["movie_id"])[0]
-        movie_map_ids += 1
-        self.interactions = self.interactions.assign(movie_map_id=movie_map_ids)
-
+    def load_interactions(self):
         dataset = Interactions(
             num_items=self.interactions["movie_map_id"].max() + 1,
             user_ids=self.interactions["user_id"].values,
             item_ids=self.interactions["movie_map_id"].values,
             timestamps=self.interactions["timestamp"].values,
         )
+        train, test = user_based_train_test_split(
+            dataset, random_state=np.random.RandomState(seed=config.SEED)
+        )
+        return train, test
 
-        train, test = random_train_test_split(dataset)
-
-        train = train.to_sequence()
-        test = test.to_sequence()
-
+    def fit(self, train_interactions: Interactions) -> None:
+        train = train_interactions.to_sequence()
         self.model.fit(train, verbose=True)
-
-        mrr_scores = sequence_mrr_score(self.model, test)
-        print(mrr_scores)
-        print(sum(mrr_scores) / len(mrr_scores))
-
         # Save model
         torch.save(self.model, config.MODEL)
 
-        # Save movie map
-        self.movie_map = pd.DataFrame(
-            {
-                "movie_id": self.interactions["movie_id"],
-                "movie_map_id": self.interactions["movie_map_id"],
-            }
-        ).drop_duplicates()
-        self.movie_map.to_csv(config.MOVIEMAP, index=False)
-
-        return self.model
+    def eval(self, test_interactions: Interactions) -> np.ndarray:
+        test = test_interactions.to_sequence()
+        return sequence_mrr_score(self.model, test)
 
     def predict(self, movies, nbr_movies=10):
         movie_ids = [self.map_movie_id(movie) for movie in movies]
