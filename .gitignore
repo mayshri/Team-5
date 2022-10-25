@@ -184,3 +184,7 @@ files
 .pytest_cache/
 # mypy
 .mypy_cache/
+
+# Pipenv
+Pipfile
+Pipfile.lock

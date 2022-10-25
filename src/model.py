@@ -179,9 +179,7 @@ class Model:
         pred = self.model.predict(sequences=np.array(movie_ids))
         indices = np.argpartition(pred, -nbr_movies)[-nbr_movies:]
         best_movie_id_indices = indices[np.argsort(pred[indices])]
-
-        movies_recommended = [self.get_movie_id(movie) for movie in best_movie_id_indices]
-        return movies_recommended
+        return [self.get_movie_id(movie) for movie in best_movie_id_indices]
 
     def recommend(self, user_id):
         if user_id not in self.users:
