@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 import torch
+from kafka import KafkaConsumer
 from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
 from spotlight.sequence.implicit import ImplicitSequenceModel
-from kafka import KafkaConsumer
 
 from . import config
 from .utils import seed_everything
@@ -86,6 +86,7 @@ class Model:
             # We get the type of request 
             # (is is_data_request = true then it is a /data/ request else it is a /rate/ request)
             is_data_request = parsed[2].find("/data/") != -1
+            is_rating_request = parsed[2].find("/rate/") != -1
              # we get the movie id from the request
             
             # If it is a /data/ request, we want to compute the "Recommended Movie Watch" Rate
@@ -93,10 +94,11 @@ class Model:
                 movie_id = parsed[2].split("/")[3]
                 if movie_id in user_recommendations:
                     self.recommmended_movies_watched += 1
+                self.recommendations.pop(user_id)
                 return
-
             # If it is a /rate/ request, we want to compute the "Recommendation Accuracy" Rate
-            if not is_data_request: 
+            elif is_rating_request:
+                print(parsed, parsed[2].split("/rate/"))
                 movie_id = parsed[2].split("/rate/")[1]
                 rating = movie_id.split("=")[1]
                 movie_id = movie_id.split("=")[0]
@@ -107,6 +109,7 @@ class Model:
                         self.recommmended_movies_positive_rating += 1
                 self.recommendations.pop(user_id)
                 return
+            else: return
         
         # Parse the movies so we only get the movies id
         movies_recommended = parsed[4:24]
