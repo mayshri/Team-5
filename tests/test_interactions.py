@@ -23,12 +23,14 @@ class TestInteractions(TestCase):
             # all movie ids should end with the year.
             # this checks that the movies column was
             # correctly processed
-            year = int(movie[-4:])
-            # according to Wikipedia, the first movie to
-            # reach "worldwide success" was in 1895
-            self.assertGreater(year, 1894)
-            # no movies can come from the future
-            self.assertGreater(2023, year)
+            if movie[-4:].isnumeric():
+                # some movie names don't end with a year
+                year = int(movie[-4:])
+                # according to Wikipedia, the first movie to
+                # reach "worldwide success" was in 1895
+                self.assertGreater(year, 1894)
+                # no movies can come from the future
+                self.assertGreater(2023, year)
 
         min_watch_time = interactions["timestamp"].min()
         max_watch_time = interactions["timestamp"].max()
