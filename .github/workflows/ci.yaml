@@ -31,3 +31,5 @@ jobs:
       run: python -m mypy .
     - name: tests
       run: python -m unittest discover -s tests
+    - name: coverage
+      run: python -m coverage run -m unittest discover -s tests; python -m coverage report -m
