@@ -9,6 +9,7 @@ from spotlight.sequence.implicit import ImplicitSequenceModel
 
 from . import config
 from .utils import seed_everything
+import requests
 
 
 class Model:
@@ -68,6 +69,8 @@ class Model:
 
         self.recommmended_movies_positive_rating = 0
         self.total_recommendations_rated = 0
+        self.average_watch_time_proportion = 0
+        self.num_movies_watched = 0
         self.setup_online_testing()
 
     def parse_entry(self, entry):
@@ -93,11 +96,22 @@ class Model:
             # we get the movie id from the request
 
             # If it is a /data/ request, we want to compute the "Recommended Movie Watch" Rate
+            # If it is a /data/ request, we want to compute the "Average watch time proportion" as well
             if is_data_request:
                 movie_id = parsed[2].split("/")[3]
                 if movie_id in user_recommendations:
                     self.recommmended_movies_watched += 1
                 self.recommendations.pop(user_id)
+                watch_time = parsed[2].split("/")[4]
+                watch_time = int(watch_time.split('.')[0])
+                movie_info = requests.get('http://fall2022-comp585.cs.mcgill.ca:8080/movie/' + movie_id).json()
+                if "runtime" not in movie_info:
+                    return
+                total_run_time = int(movie_info["runtime"])
+                if total_run_time == 0:
+                    return
+                self.average_watch_time_proportion += (watch_time / total_run_time)
+                self.num_movies_watched += 1
                 return
             # If it is a /rate/ request, we want to compute the "Recommendation Accuracy" Rate
             elif is_rating_request:
@@ -132,6 +146,10 @@ class Model:
             print("writing accuracy", str(self.compute_recommendation_accuracy()))
             f.write(str(self.compute_recommendation_accuracy()))
 
+        with open(config.AVERAGEWATCHTIMEPROPORTION, "w") as f:
+            print("writing average watch time proportion", str(self.compute_average_watch_time_proportion()))
+            f.write(str(self.compute_average_watch_time_proportion()))
+
     def compute_recommendation_watch_rate(self):
         print(self.recommmended_movies_watched, self.total_recommendations)
         if self.total_recommendations == 0:
@@ -145,8 +163,13 @@ class Model:
         if self.total_recommendations_rated == 0:
             return 0
         return (
-            self.recommmended_movies_positive_rating / self.total_recommendations_rated
+                self.recommmended_movies_positive_rating / self.total_recommendations_rated
         )
+
+    def compute_average_watch_time_proportion(self):
+        if self.num_movies_watched == 0:
+            return 0
+        return round(self.average_watch_time_proportion / self.num_movies_watched, 4)
 
     def setup_online_testing(self):
         server = "fall2022-comp585.cs.mcgill.ca:9092"
