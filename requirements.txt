@@ -7,7 +7,7 @@ numpy
 torch
 tqdm
 scikit-learn
-kafka
+kafka-python
 git+https://github.com/maciejkula/spotlight.git#egg=spotlight
 Flask==2.2.2
 requests
