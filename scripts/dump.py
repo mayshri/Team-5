@@ -7,12 +7,12 @@ topic = "movielog5"
 
 consumer = KafkaConsumer(topic, bootstrap_servers=[server], api_version=(0, 11, 5))
 
-f = open("data.csv", "w")
+f = open("data/kafka-dump.csv", "w")
 writer = csv.writer(f)
 
 num = 0
 for message in consumer:
-    if num >= 100000:
+    if num >= 900000:
         break
 
     num += 1

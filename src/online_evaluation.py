@@ -1,21 +1,20 @@
 import requests
 from kafka import KafkaConsumer
 
-from . import config
+from src import config
 
 
 class online_evaluation:
     def __init__(self):
 
         self.recommendations = {}
-
         self.recommmended_movies_watched = 0
         self.total_recommendations = 0
-
         self.recommmended_movies_positive_rating = 0
         self.total_recommendations_rated = 0
         self.average_watch_time_proportion = 0
         self.num_movies_watched = 0
+        self.total_rank_movie_watched = 0
         self.setup_online_testing()
 
     def parse_entry(self, entry):
@@ -46,6 +45,10 @@ class online_evaluation:
                 movie_id = parsed[2].split("/")[3]
                 if movie_id in user_recommendations:
                     self.recommmended_movies_watched += 1
+                    self.total_rank_movie_watched += (
+                        user_recommendations.index(movie_id) + 1
+                    )
+
                 self.recommendations.pop(user_id)
                 watch_time = parsed[2].split("/")[4]
                 watch_time = int(watch_time.split(".")[0])
@@ -82,6 +85,7 @@ class online_evaluation:
         movies_recommended = [s.strip() for s in movies_recommended]
         self.recommendations[user_id] = movies_recommended
         self.total_recommendations += 1
+        return
 
     def write_metrics(self):
         # Write the metrics to a file
@@ -99,6 +103,12 @@ class online_evaluation:
                 str(self.compute_average_watch_time_proportion()),
             )
             f.write(str(self.compute_average_watch_time_proportion()))
+        with open(config.AVERAGEWATCHMOVIERANK, "w") as f:
+            print(
+                "writing average rank of recommended movie watched",
+                str(self.compute_movie_watched_rank()),
+            )
+            f.write(str(self.compute_movie_watched_rank()))
 
     def compute_recommendation_watch_rate(self):
         print(self.recommmended_movies_watched, self.total_recommendations)
@@ -121,6 +131,12 @@ class online_evaluation:
             return 0
         return round(self.average_watch_time_proportion / self.num_movies_watched, 4)
 
+    def compute_movie_watched_rank(self):
+        print(self.total_rank_movie_watched, self.recommmended_movies_watched)
+        if self.recommmended_movies_watched == 0:
+            return 0
+        return self.total_rank_movie_watched / self.recommmended_movies_watched
+
     def setup_online_testing(self):
         server = "fall2022-comp585.cs.mcgill.ca:9092"
         topic = "movielog5"
@@ -131,8 +147,9 @@ class online_evaluation:
 
         entries = 0
         for message in consumer:
+            print(message)
             entries += 1
             self.parse_entry(message)
-            if entries == 10000:
+            if entries == 100000:
                 entries = 0
                 self.write_metrics()
