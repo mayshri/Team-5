@@ -6,12 +6,10 @@ from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
 from spotlight.sequence.implicit import ImplicitSequenceModel
 
-from . import config
-from .utils import seed_everything
+from src import config, utils
 
 
 class Model:
-
     """
     Train the model using the following script:
     ```python
@@ -32,7 +30,7 @@ class Model:
 
     def __init__(self):
 
-        seed_everything(config.SEED)
+        utils.seed_everything(config.SEED)
         self.model = ImplicitSequenceModel(
             n_iter=10,
             representation="cnn",

@@ -72,12 +72,18 @@ class ProcessDumps:
 
         # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
+        df["timestamp"] = df["timestamp"].map(lambda x: x.replace("b'", ""))
+        df = df[df.timestamp.apply(lambda x: cls.check_timestamp(x))]
         df["timestamp"] = df["timestamp"].map(
-            lambda x: time.mktime(cls.try_parsing_date(x.replace("b'", "")).timetuple())
+            lambda x: time.mktime(cls.try_parsing_date(x).timetuple())
         )
         df = df.drop(labels=["request"], axis=1).drop_duplicates(
             subset=["user_id", "movie_id"]
         )
+        df = df[df.user_id.apply(lambda x: x.isnumeric())]
+
+        df = df[df.user_id >= "1"]
+        df = df[df.user_id <= "1000000"]
 
         verify_data = pd.read_csv(VERIFY)
         verified_movies = verify_data["movie_id"].tolist()
@@ -87,8 +93,10 @@ class ProcessDumps:
             movielist = list(dict.fromkeys(df["movie_id"].tolist()))
             for movie_id in movielist:
                 if movie_id in verified_movies:
+                    print("verified")
                     pass
                 else:
+                    print("unverified")
                     code = requests.get(
                         "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
                     ).status_code
