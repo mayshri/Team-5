@@ -81,9 +81,7 @@ class ProcessDumps:
             subset=["user_id", "movie_id"]
         )
         df = df[df.user_id.apply(lambda x: x.isnumeric())]
-
-        df = df[df.user_id >= "1"]
-        df = df[df.user_id <= "1000000"]
+        df = df[df.user_id.apply(lambda x: 1 <= int(x) <= 1000000)]
 
         verify_data = pd.read_csv(VERIFY)
         verified_movies = verify_data["movie_id"].tolist()

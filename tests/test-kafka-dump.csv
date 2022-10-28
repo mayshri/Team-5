@@ -1,5 +1,14 @@
-movielog5,1,79651978,1664149445006,0,,"b'2022-09-25T19:44:05,429303,GET /data/m/the+russia+house+1990/10.mpg'",[],,-1,67,-1
-movielog5,1,79651979,1664149445006,0,,"b'2022-09-25T19:44:05,457740,GET /data/m/holy+motors+2012/3.mpg'",[],,-1,61,-1
-movielog5,1,79651980,1664149445006,0,,"b'2022-09-25T19:44:05,147635,GET /data/m/oranges+and+sunshine+2010/90.mpg'",[],,-1,71,-1
-movielog5,1,79651981,1664149445006,0,,"b'2022-09-25T19:44:05,468546,GET /data/m/the+terminal+2004/10.mpg'",[],,-1,63,-1
-movielog5,1,79651982,1664149445006,0,,"b'2022-09-25T19:44:05,329496,GET /data/m/the+bridge+on+the+river+kwai+1957/17.mpg'",[],,-1,79,-1
+movielog5,1,863752879,1666945403392,0,,"b'2022-10-28T04:23:23,579130,GET /data/m/inception+2010/115.mpg'",[],,-1,61,-1
+movielog5,1,863752880,1666945403393,0,,"b'2022-10-28T 04:23:23,531789,GET /data/m/the+shawshank+redemption+1994/85.mpg'",[],,-1,75,-1
+movielog5,1,863752881,1666945403394,0,,"b'2022-10-28T04:23:23,-25611,GET /data/m/the+shawshank+redemption+1994/100.mpg'",[],,-1,75,-1
+movielog5,1,863752882,1666945403394,0,,"b'2022-10-28T04:23:23,321486,GET /data/m/nomads+1986/48.mpg'",[],,-1,57,-1
+movielog5,1,863752883,1666945403397,0,,"b'2022-10-28T04:23:23,416682,GET /data/m/the+lord+of+the+rings+the+return+of+the+king+2003/197.mpg'",[],,-1,96,-1
+movielog5,1,863752884,1666945403398,0,,"b'2022-1k0-28T04:23:23,90586,GET /data/m/the+lord+of+the+rings+the+fellowship+of+the+ring+2001/155.mpg'",[],,-1,99,-1
+movielog5,1,863752885,1666945403398,0,,"b'2022-10-28T04:23:23,613693,GET /data/m/interstellar+2014/114.mpg'",[],,-1,64,-1
+movielog5,1,863752886,1666945403399,0,,"b'2022-10-28T04:23:23.097,44572,recommendation request fall2022-comp585-5.cs.mcgill.ca:8082, status 200, result: the+shawshank+redemption+1994, interstellar+2014, inception+2010, the+lord+of+the+rings+the+fellowship+of+the+ring+2001, the+lord+of+the+rings+the+two+towers+2002, the+lord+of+the+rings+the+return+of+the+king+2003, the+godfather+1972, star+wars+1977, pulp+fiction+1994, the+dark+knight+2008, spirited+away+2001, fight+club+1999, harry+potter+and+the+deathly+hallows+part+2+2011, the+avengers+2012, the+dark+knight+rises+2012, the+matrix+1999, raiders+of+the+lost+ark+1981, seven+samurai+1954, the+good_+the+bad+and+the+ugly+1966, saving+private+ryan+1998, 56 ms'",[],,-1,672,-1
+movielog5,0,863752885,1666945403398,0,,"b'2022-10-28T04:23:23,443059,GET /data/m/the+newest+pledge+2012/17.mpg'",[],,-1,68,-1
+movielog5,0,863752886,1666945403399,0,,"b'2022-10-28T04:23:23.099,3058,recommendation request fall2022-comp585-5.cs.mcgill.ca:8082, status 200, result: the+shawshank+redemption+1994, interstellar+2014, inception+2010, the+lord+of+the+rings+the+fellowship+of+the+ring+2001, the+lord+of+the+rings+the+two+towers+2002, the+lord+of+the+rings+the+return+of+the+king+2003, the+godfather+1972, star+wars+1977, pulp+fiction+1994, the+dark+knight+2008, spirited+away+2001, fight+club+1999, harry+potter+and+the+deathly+hallows+part+2+2011, the+avengers+2012, the+dark+knight+rises+2012, the+matrix+1999, raiders+of+the+lost+ark+1981, seven+samurai+1954, the+good_+the+bad+and+the+ugly+1966, saving+private+ryan+1998, 55 ms'",[],,-1,671,-1
+movielog5,1,863752887,1666945404004,0,,"b'2022-10-28T04:23:24,12599,GET /data/m/the+dark+knight+2008/4.mpg'",[],,-1,64,-1
+movielog5,0,863752887,1666945404005,0,,"b'2022-10-28T04:23:24,5521777,GET /data/m/the+shawshank+redemption+1994/69.mpg'",[],,-1,75,-1
+movielog5,0,863752888,1666945404005,0,,"b'2022-10-28T04:23:24,24f162,GET /data/m/the+shawshank+redemption+1994/2.mpg'",[],,-1,74,-1
+movielog5,0,863752889,1666945404005,0,,"b'2022-10-28T04:23:24,226935,GET /data/m/titanic+1997/181.mpg'",[],,-1,59,-1
