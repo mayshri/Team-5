@@ -32,14 +32,6 @@ class TestInteractions(TestCase):
                 # no movies can come from the future
                 self.assertGreater(2023, year)
 
-        min_watch_time = interactions["timestamp"].min()
-        max_watch_time = interactions["timestamp"].max()
-
-        # all movies should be watched this year. This checks
-        # that the timestamp column was correctly processed
-        self.assertEqual(datetime.fromtimestamp(min_watch_time).year, 2022)
-        self.assertEqual(datetime.fromtimestamp(max_watch_time).year, 2022)
-
     def test_timestamp(self):
 
         interactions = pd.read_csv(INTERACTIONS)
@@ -62,11 +54,11 @@ class TestInteractions(TestCase):
         self.assertEqual(
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
         )
-        users = interactions.user_id
+        users = interactions.user_id.unique()
         for u in users:
             self.assertTrue(u.isnumeric())
 
-    def test_user_id_is_greater(self):
+    def test_user_id_is_valid(self):
 
         interactions = pd.read_csv(INTERACTIONS)
 
@@ -74,20 +66,8 @@ class TestInteractions(TestCase):
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
         )
 
-        users = interactions.user_id
+        users = interactions.user_id.unique()
 
         for u in users:
             self.assertGreaterEqual(u, 1)
-
-    def test_user_id_is_smaller(self):
-
-        interactions = pd.read_csv(INTERACTIONS)
-
-        self.assertEqual(
-            set(interactions.columns), {"timestamp", "user_id", "movie_id"}
-        )
-
-        users = interactions.user_id
-
-        for u in users:
             self.assertLessEqual(u, 1000000)

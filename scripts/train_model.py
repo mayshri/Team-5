@@ -41,5 +41,6 @@ def train_model(amount: int):
 
 
 # specify the number of new entries you want to process
-n = 100000
-train_model(n)
+if __name__ == "__main__":
+    n = 100000
+    train_model(n)
