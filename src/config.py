@@ -11,8 +11,8 @@ INTERACTIONS = DATAFOLDER / "interactions.csv"
 DUMP = DATAFOLDER / "kafka-dump.csv"
 VERIFY = DATAFOLDER / "verified_movie.csv"
 
-
 METRICSFOLDER = Path(__file__).parents[1] / "metrics"
 RECOMMENDEDMOVIEWATCHRATE = METRICSFOLDER / "recommended_movie_watch_rate.txt"
 RECOMMENDEDMOVIEACCURACY = METRICSFOLDER / "recommended_movie_accuracy.txt"
 AVERAGEWATCHTIMEPROPORTION = METRICSFOLDER / "average_watch_time_proportion.txt"
+AVERAGEWATCHMOVIERANK = METRICSFOLDER / "average_watch_movie_rank.txt"
