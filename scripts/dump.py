@@ -2,20 +2,26 @@ import csv
 
 from kafka import KafkaConsumer
 
-server = "fall2022-comp585.cs.mcgill.ca:9092"
-topic = "movielog5"
+from src.config import DUMP
 
-consumer = KafkaConsumer(topic, bootstrap_servers=[server], api_version=(0, 11, 5))
 
-f = open("data.csv", "w")
-writer = csv.writer(f)
+def dump(amount: int):
+    server = "fall2022-comp585.cs.mcgill.ca:9092"
+    topic = "movielog5"
 
-num = 0
-for message in consumer:
-    if num >= 100000:
-        break
+    consumer = KafkaConsumer(topic, bootstrap_servers=[server], api_version=(0, 11, 5))
 
-    num += 1
-    writer.writerow(message)
+    f = open(DUMP, "w")
+    writer = csv.writer(f)
+    num = 0
+    for message in consumer:
+        if num >= amount:
+            break
+        num += 1
+        writer.writerow(message)
+    f.close()
 
-f.close()
+
+# specify the number of entries you want to dump
+amount = 100000
+dump(amount)

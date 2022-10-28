@@ -1,16 +1,19 @@
+import csv
 import datetime
 import time
 from pathlib import Path
 from typing import Union
 
 import pandas as pd
+import requests
+
+from src.config import VERIFY
 
 DATAFOLDER = Path(__file__).parents[1] / "data"
 INTERACTIONS = DATAFOLDER / "interactions.csv"
 
 
 class ProcessDumps:
-
     """
     Usage:
     ```
@@ -39,8 +42,18 @@ class ProcessDumps:
         return df
 
     @staticmethod
+    def check_timestamp(text):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S.%3fZ"):
+            try:
+                datetime.datetime.strptime(text, fmt)
+                return True
+            except ValueError:
+                pass
+        return False
+
+    @staticmethod
     def try_parsing_date(text):
-        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S.%3fZ"):
             try:
                 return datetime.datetime.strptime(text, fmt)
             except ValueError:
@@ -66,6 +79,24 @@ class ProcessDumps:
             subset=["user_id", "movie_id"]
         )
 
+        verify_data = pd.read_csv(VERIFY)
+        verified_movies = verify_data["movie_id"].tolist()
+
+        with open(VERIFY, "a") as f:
+            writer = csv.writer(f, delimiter=",")
+            movielist = list(dict.fromkeys(df["movie_id"].tolist()))
+            for movie_id in movielist:
+                if movie_id in verified_movies:
+                    pass
+                else:
+                    code = requests.get(
+                        "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
+                    ).status_code
+                    if code == 200:
+                        verified_movies.append(movie_id)
+                        writer.writerow([movie_id])
+                    else:
+                        df = df.drop(df.loc[df["movie_id"] == movie_id].index)
         return df
 
     @classmethod

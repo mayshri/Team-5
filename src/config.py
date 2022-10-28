@@ -8,6 +8,8 @@ MOVIEMAP = MODELSFOLDER / "movie_map.csv"
 
 DATAFOLDER = Path(__file__).parents[1] / "data"
 INTERACTIONS = DATAFOLDER / "interactions.csv"
+DUMP = DATAFOLDER / "kafka-dump.csv"
+VERIFY = DATAFOLDER / "verified_movie.csv"
 
 
 METRICSFOLDER = Path(__file__).parents[1] / "metrics"

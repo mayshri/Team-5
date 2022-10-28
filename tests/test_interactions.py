@@ -2,7 +2,6 @@ from datetime import datetime
 from unittest import TestCase
 
 import pandas as pd
-import requests
 
 from src.config import INTERACTIONS
 
@@ -40,20 +39,3 @@ class TestInteractions(TestCase):
         # that the timestamp column was correctly processed
         self.assertEqual(datetime.fromtimestamp(min_watch_time).year, 2022)
         self.assertEqual(datetime.fromtimestamp(max_watch_time).year, 2022)
-
-    def test_movie_exists(self):
-        interactions = pd.read_csv(INTERACTIONS)
-
-        self.assertEqual(
-            set(interactions.columns), {"timestamp", "user_id", "movie_id"}
-        )
-
-        # check whether the movie exists in the API
-        all_movie_ids = interactions.movie_id
-        for m in all_movie_ids:
-            self.assertEqual(
-                requests.get(
-                    "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + m
-                ).status_code,
-                200,
-            )

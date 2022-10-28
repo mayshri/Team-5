@@ -1,7 +1,7 @@
 import requests
 from kafka import KafkaConsumer
 
-from . import config
+from src import config
 
 
 class online_evaluation:
