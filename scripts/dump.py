@@ -23,5 +23,5 @@ def dump(amount: int):
 
 
 # specify the number of entries you want to dump
-amount = 100000
-dump(amount)
+n = 100000
+dump(n)
