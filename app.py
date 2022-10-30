@@ -1,6 +1,7 @@
 from flask import Flask
 
 from src.model import Model
+from src.online_evaluation import OnlineEvaluation
 
 app = Flask(__name__)
 
@@ -17,3 +18,6 @@ def response(userid: str):
         result += ","
     result = result[:-1]
     return result
+
+
+OnlineEvaluation(43200, 1000)
