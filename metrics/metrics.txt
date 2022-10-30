@@ -1,8 +1,8 @@
 
-1667151731
+ran for 1 hour for testing:
 Watch rate: 0.692
 Good rating proportion: 0.8571428571428571
 Average watch time proportion: 0.12882510609783338
 Avg watch rank: 3.6459537572254335
 recommended proportion in total watched: 0.6744639376218323
-
+Below are the real results run for 12 hours:

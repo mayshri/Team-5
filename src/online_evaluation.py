@@ -111,7 +111,7 @@ class OnlineEvaluation:
                     self.total_recommendations_rated += 1
                     if float(rating) >= 4:
                         self.recommended_movies_positive_rating += 1
-                self.print_temp_metrics(self.timestamp)
+                    self.print_temp_metrics(self.timestamp)
                 return
             else:
                 return
@@ -303,7 +303,3 @@ class OnlineEvaluation:
                     self.write_metrics(self.timestamp)
                     self.save_telemetry()
                 self.reset()
-
-
-if __name__ == "__main__":
-    OnlineEvaluation(3600, 1000)
