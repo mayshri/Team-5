@@ -88,12 +88,13 @@ class OnlineEvaluation:
                         )
                         self.recommended_watch_time += 1
                         self.recommended_movie_length += movie_length
-                        self.movie_watched_length[user_id][movie_id] = 1
+                    self.movie_watched_length[user_id][movie_id] = 1
                     self.total_watch_num += 1
                 else:
                     if movie_id in user_recommendations:
-                        self.movie_watched_length[user_id][movie_id] += 1
-                # self.print_temp_metrics(self.timestamp)
+                        self.recommended_watch_time += 1
+                    self.movie_watched_length[user_id][movie_id] += 1
+                self.print_temp_metrics(self.timestamp)
                 return
 
             # If it is a /rate/ request, we want to compute the "Recommendation Accuracy" Rate
@@ -110,7 +111,7 @@ class OnlineEvaluation:
                     self.total_recommendations_rated += 1
                     if float(rating) >= 4:
                         self.recommended_movies_positive_rating += 1
-                # self.print_temp_metrics(self.timestamp)
+                self.print_temp_metrics(self.timestamp)
                 return
             else:
                 return
@@ -283,4 +284,4 @@ class OnlineEvaluation:
 
 
 if __name__ == "__main__":
-    OnlineEvaluation(43200, 1000)
+    OnlineEvaluation(3600, 1000)
