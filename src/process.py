@@ -46,6 +46,7 @@ class ProcessDumps:
     ```
     """
 
+    """
     @staticmethod
     def raw_to_ratings(raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
@@ -64,10 +65,11 @@ class ProcessDumps:
         df = df.drop(labels=["request"], axis=1)
 
         return df
+    """
 
     @staticmethod
     def try_parsing_date(text):
-        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S.%3fZ"):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
             try:
                 return datetime.datetime.strptime(text, fmt)
             except ValueError:

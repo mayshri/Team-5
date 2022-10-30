@@ -175,6 +175,28 @@ class OnlineEvaluation:
                 + str(self.compute_recommended_watched_by_total_watched())
                 + "\n"
             )
+        with open(config.METRICFILE, "a") as f:
+            f.write(
+                str(timestamp)
+                + "\n"
+                + "Watch rate: "
+                + str(self.compute_recommendation_watch_rate())
+                + "\n"
+                + "Good rating proportion: "
+                + str(self.compute_recommendation_accuracy())
+                + "\n"
+                + "Average watch time proportion: "
+                + str(self.compute_average_watch_time_proportion())
+                + "\n"
+                + "Avg watch rank: "
+                + str(self.compute_movie_watched_rank())
+                + "\n"
+                + "recommended proportion in total watched: "
+                + str(self.compute_recommended_watched_by_total_watched())
+                + "\n"
+                + " "
+                + "\n"
+            )
 
     def print_temp_metrics(self, timestamp):
         # Write the metrics to a file
@@ -284,4 +306,4 @@ class OnlineEvaluation:
 
 
 if __name__ == "__main__":
-    OnlineEvaluation(43200, 1000)
+    OnlineEvaluation(3600, 1000)
