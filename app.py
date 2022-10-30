@@ -1,6 +1,8 @@
-from flask import Flask
+from flask import Flask, Response
 
+from src import config
 from src.model import Model
+from src.online_evaluation import OnlineEvaluation
 
 app = Flask(__name__)
 
@@ -17,3 +19,13 @@ def response(userid: str):
         result += ","
     result = result[:-1]
     return result
+
+
+@app.route("/recommend/online_evaluations")
+def metric():
+    with open(config.METRICFILE, "r") as f:
+        text = f.read()
+    return Response(text, mimetype="text/plain")
+
+
+OnlineEvaluation(43200, 1000)

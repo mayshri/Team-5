@@ -13,6 +13,30 @@ DATAFOLDER = Path(__file__).parents[1] / "data"
 INTERACTIONS = DATAFOLDER / "interactions.csv"
 
 
+def check_timestamp(text):
+    for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
+        try:
+            datetime.datetime.strptime(text, fmt)
+            return True
+        except ValueError:
+            pass
+    return False
+
+
+def check_user_id(user_id):
+    if user_id.isnumeric():
+        if 1 <= int(user_id) <= 1000000:
+            return True
+    return False
+
+
+def check_movie_id(movie_id):
+    code = requests.get(
+        "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
+    ).status_code
+    return code == 200
+
+
 class ProcessDumps:
     """
     Usage:
@@ -22,6 +46,7 @@ class ProcessDumps:
     ```
     """
 
+    """
     @staticmethod
     def raw_to_ratings(raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
@@ -40,20 +65,11 @@ class ProcessDumps:
         df = df.drop(labels=["request"], axis=1)
 
         return df
-
-    @staticmethod
-    def check_timestamp(text):
-        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S.%3fZ"):
-            try:
-                datetime.datetime.strptime(text, fmt)
-                return True
-            except ValueError:
-                pass
-        return False
+    """
 
     @staticmethod
     def try_parsing_date(text):
-        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S.%3fZ"):
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
             try:
                 return datetime.datetime.strptime(text, fmt)
             except ValueError:
@@ -73,15 +89,14 @@ class ProcessDumps:
         # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
         df["timestamp"] = df["timestamp"].map(lambda x: x.replace("b'", ""))
-        df = df[df.timestamp.apply(lambda x: cls.check_timestamp(x))]
+        df = df[df.timestamp.apply(lambda x: check_timestamp(x))]
         df["timestamp"] = df["timestamp"].map(
             lambda x: time.mktime(cls.try_parsing_date(x).timetuple())
         )
         df = df.drop(labels=["request"], axis=1).drop_duplicates(
             subset=["user_id", "movie_id"]
         )
-        df = df[df.user_id.apply(lambda x: x.isnumeric())]
-        df = df[df.user_id.apply(lambda x: 1 <= int(x) <= 1000000)]
+        df = df[df.user_id.apply(lambda x: check_user_id(x))]
 
         verify_data = pd.read_csv(VERIFY)
         verified_movies = verify_data["movie_id"].tolist()
@@ -91,14 +106,9 @@ class ProcessDumps:
             movielist = list(dict.fromkeys(df["movie_id"].tolist()))
             for movie_id in movielist:
                 if movie_id in verified_movies:
-                    print("verified")
                     pass
                 else:
-                    print("unverified")
-                    code = requests.get(
-                        "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
-                    ).status_code
-                    if code == 200:
+                    if check_movie_id(movie_id):
                         verified_movies.append(movie_id)
                         writer.writerow([movie_id])
                     else:
