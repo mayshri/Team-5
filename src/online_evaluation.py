@@ -1,18 +1,18 @@
-import requests
 import json
+import requests
 import time
 from kafka import KafkaConsumer
 
 from src import config
 
 
-class online_evaluation:
+class OnlineEvaluation:
     def __init__(self):
 
         self.recommendations = {}
-        self.recommmended_movies_watched = 0
+        self.recommended_movies_watched = 0
         self.total_recommendations = 0
-        self.recommmended_movies_positive_rating = 0
+        self.recommended_movies_positive_rating = 0
         self.total_recommendations_rated = 0
         self.average_watch_time_proportion = 0
         self.num_movies_watched = 0
@@ -20,8 +20,8 @@ class online_evaluation:
         self.online_evaluation_threshold = 1000
         # initialize telemetry.json
         with open(config.TELEMETRYPATH, 'w') as f:
-            data = {"recommendations": [], "recommmended_movies_watched": [], "total_recommendations": [],
-                    "recommmended_movies_positive_rating": [], "total_recommendations_rated": [],
+            data = {"recommendations": [], "recommended_movies_watched": [], "total_recommendations": [],
+                    "recommended_movies_positive_rating": [], "total_recommendations_rated": [],
                     "average_watch_time_proportion": [], "num_movies_watched": [], "total_rank_movie_watched": []}
             json.dump(data, f)
         self.setup_online_testing()
@@ -53,7 +53,7 @@ class online_evaluation:
             if is_data_request:
                 movie_id = parsed[2].split("/")[3]
                 if movie_id in user_recommendations:
-                    self.recommmended_movies_watched += 1
+                    self.recommended_movies_watched += 1
                     self.total_rank_movie_watched += (
                             user_recommendations.index(movie_id) + 1
                     )
@@ -82,7 +82,7 @@ class online_evaluation:
                 if movie_id in user_recommendations:
                     self.total_recommendations_rated += 1
                     if float(rating) >= 4:
-                        self.recommmended_movies_positive_rating += 1
+                        self.recommended_movies_positive_rating += 1
                 self.recommendations.pop(user_id)
                 return
             else:
@@ -122,19 +122,19 @@ class online_evaluation:
             f.write(str(timestamp) + " " + str(self.compute_movie_watched_rank()) + "\n")
 
     def compute_recommendation_watch_rate(self):
-        print(self.recommmended_movies_watched, self.total_recommendations)
+        print(self.recommended_movies_watched, self.total_recommendations)
         if self.total_recommendations == 0:
             return 0
-        return self.recommmended_movies_watched / self.total_recommendations
+        return self.recommended_movies_watched / self.total_recommendations
 
     def compute_recommendation_accuracy(self):
         print(
-            self.recommmended_movies_positive_rating, self.total_recommendations_rated
+            self.recommended_movies_positive_rating, self.total_recommendations_rated
         )
         if self.total_recommendations_rated == 0:
             return 0
         return (
-                self.recommmended_movies_positive_rating / self.total_recommendations_rated
+                self.recommended_movies_positive_rating / self.total_recommendations_rated
         )
 
     def compute_average_watch_time_proportion(self):
@@ -143,10 +143,10 @@ class online_evaluation:
         return round(self.average_watch_time_proportion / self.num_movies_watched, 4)
 
     def compute_movie_watched_rank(self):
-        print(self.total_rank_movie_watched, self.recommmended_movies_watched)
-        if self.recommmended_movies_watched == 0:
+        print(self.total_rank_movie_watched, self.recommended_movies_watched)
+        if self.recommended_movies_watched == 0:
             return 0
-        return self.total_rank_movie_watched / self.recommmended_movies_watched
+        return self.total_rank_movie_watched / self.recommended_movies_watched
 
     def setup_online_testing(self):
         server = "fall2022-comp585.cs.mcgill.ca:9092"
@@ -172,9 +172,9 @@ class online_evaluation:
         with open(config.TELEMETRYPATH, 'r') as f:
             data = json.load(f)
         data["recommendations"].append(self.recommendations)
-        data["recommmended_movies_watched"].append(self.recommmended_movies_watched)
+        data["recommmended_movies_watched"].append(self.recommended_movies_watched)
         data["total_recommendations"].append(self.total_recommendations)
-        data["recommmended_movies_positive_rating"].append(self.recommmended_movies_positive_rating)
+        data["recommmended_movies_positive_rating"].append(self.recommended_movies_positive_rating)
         data["total_recommendations_rated"].append(self.total_recommendations_rated)
         data["average_watch_time_proportion"].append(self.average_watch_time_proportion)
         data["num_movies_watched"].append(self.num_movies_watched)
@@ -184,9 +184,9 @@ class online_evaluation:
 
     def reset(self):
         self.recommendations = {}
-        self.recommmended_movies_watched = 0
+        self.recommended_movies_watched = 0
         self.total_recommendations = 0
-        self.recommmended_movies_positive_rating = 0
+        self.recommended_movies_positive_rating = 0
         self.total_recommendations_rated = 0
         self.average_watch_time_proportion = 0
         self.num_movies_watched = 0
