@@ -16,3 +16,5 @@ RECOMMENDEDMOVIEWATCHRATE = METRICSFOLDER / "recommended_movie_watch_rate.txt"
 RECOMMENDEDMOVIEACCURACY = METRICSFOLDER / "recommended_movie_accuracy.txt"
 AVERAGEWATCHTIMEPROPORTION = METRICSFOLDER / "average_watch_time_proportion.txt"
 AVERAGEWATCHMOVIERANK = METRICSFOLDER / "average_watch_movie_rank.txt"
+
+TELEMETRYPATH = METRICSFOLDER / "telemetry.json"

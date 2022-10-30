@@ -2,6 +2,8 @@ import requests
 from kafka import KafkaConsumer
 
 from src import config
+import json
+import time
 
 
 class online_evaluation:
@@ -15,6 +17,13 @@ class online_evaluation:
         self.average_watch_time_proportion = 0
         self.num_movies_watched = 0
         self.total_rank_movie_watched = 0
+        self.online_evaluation_threshold = 1000
+        # initialize telemetry.json
+        with open(config.TELEMETRYPATH, 'w') as f:
+            data = {"recommendations": [], "recommmended_movies_watched": [], "total_recommendations": [],
+                    "recommmended_movies_positive_rating": [], "total_recommendations_rated": [],
+                    "average_watch_time_proportion": [], "num_movies_watched": [], "total_rank_movie_watched": []}
+            json.dump(data, f)
         self.setup_online_testing()
 
     def parse_entry(self, entry):
@@ -46,7 +55,7 @@ class online_evaluation:
                 if movie_id in user_recommendations:
                     self.recommmended_movies_watched += 1
                     self.total_rank_movie_watched += (
-                        user_recommendations.index(movie_id) + 1
+                            user_recommendations.index(movie_id) + 1
                     )
 
                 self.recommendations.pop(user_id)
@@ -64,7 +73,7 @@ class online_evaluation:
                 self.num_movies_watched += 1
                 return
             # If it is a /rate/ request, we want to compute the "Recommendation Accuracy" Rate
-            elif is_rating_request:
+            if is_rating_request:
                 print(parsed, parsed[2].split("/rate/"))
                 movie_id = parsed[2].split("/rate/")[1]
                 rating = movie_id.split("=")[1]
@@ -72,7 +81,7 @@ class online_evaluation:
 
                 if movie_id in user_recommendations:
                     self.total_recommendations_rated += 1
-                    if float(rating) >= 5:
+                    if float(rating) >= 4:
                         self.recommmended_movies_positive_rating += 1
                 self.recommendations.pop(user_id)
                 return
@@ -83,32 +92,34 @@ class online_evaluation:
         movies_recommended = parsed[4:24]
         movies_recommended[0] = movies_recommended[0].replace("result: ", "")
         movies_recommended = [s.strip() for s in movies_recommended]
+        if self.total_recommendations >= self.online_evaluation_threshold:
+            return
         self.recommendations[user_id] = movies_recommended
         self.total_recommendations += 1
         return
 
-    def write_metrics(self):
+    def write_metrics(self, timestamp):
         # Write the metrics to a file
-        with open(config.RECOMMENDEDMOVIEWATCHRATE, "w") as f:
+        with open(config.RECOMMENDEDMOVIEWATCHRATE, "a") as f:
             print("writing watch rate", str(self.compute_recommendation_watch_rate()))
-            f.write(str(self.compute_recommendation_watch_rate()))
+            f.write(str(timestamp) + " " + str(self.compute_recommendation_watch_rate()) + "\n")
 
-        with open(config.RECOMMENDEDMOVIEACCURACY, "w") as f:
+        with open(config.RECOMMENDEDMOVIEACCURACY, "a") as f:
             print("writing accuracy", str(self.compute_recommendation_accuracy()))
-            f.write(str(self.compute_recommendation_accuracy()))
+            f.write(str(timestamp) + " " + str(self.compute_recommendation_accuracy()) + "\n")
 
-        with open(config.AVERAGEWATCHTIMEPROPORTION, "w") as f:
+        with open(config.AVERAGEWATCHTIMEPROPORTION, "a") as f:
             print(
                 "writing average watch time proportion",
                 str(self.compute_average_watch_time_proportion()),
             )
-            f.write(str(self.compute_average_watch_time_proportion()))
-        with open(config.AVERAGEWATCHMOVIERANK, "w") as f:
+            f.write(str(timestamp) + " " + str(self.compute_average_watch_time_proportion()) + "\n")
+        with open(config.AVERAGEWATCHMOVIERANK, "a") as f:
             print(
                 "writing average rank of recommended movie watched",
                 str(self.compute_movie_watched_rank()),
             )
-            f.write(str(self.compute_movie_watched_rank()))
+            f.write(str(timestamp) + " " + str(self.compute_movie_watched_rank()) + "\n")
 
     def compute_recommendation_watch_rate(self):
         print(self.recommmended_movies_watched, self.total_recommendations)
@@ -123,7 +134,7 @@ class online_evaluation:
         if self.total_recommendations_rated == 0:
             return 0
         return (
-            self.recommmended_movies_positive_rating / self.total_recommendations_rated
+                self.recommmended_movies_positive_rating / self.total_recommendations_rated
         )
 
     def compute_average_watch_time_proportion(self):
@@ -144,12 +155,40 @@ class online_evaluation:
         consumer = KafkaConsumer(
             topic, bootstrap_servers=[server], api_version=(0, 11, 5)
         )
-
-        entries = 0
+        timestamp = int(time.time())
         for message in consumer:
-            print(message)
-            entries += 1
+            # print(message)
             self.parse_entry(message)
-            if entries == 100000:
-                entries = 0
-                self.write_metrics()
+            # track 1000 recommendations for 12 hours
+            if timestamp + 43200 > int(time.time()):
+                continue
+            if self.total_recommendations >= self.online_evaluation_threshold:
+                self.write_metrics(timestamp)
+                self.save_telemetry()
+                self.reset()
+                timestamp = int(time.time())
+                
+    def save_telemetry(self):
+        with open(config.TELEMETRYPATH, 'r') as f:
+            data = json.load(f)
+        data["recommendations"].append(self.recommendations)
+        data["recommmended_movies_watched"].append(self.recommmended_movies_watched)
+        data["total_recommendations"].append(self.total_recommendations)
+        data["recommmended_movies_positive_rating"].append(self.recommmended_movies_positive_rating)
+        data["total_recommendations_rated"].append(self.total_recommendations_rated)
+        data["average_watch_time_proportion"].append(self.average_watch_time_proportion)
+        data["num_movies_watched"].append(self.num_movies_watched)
+        data["total_rank_movie_watched"].append(self.total_rank_movie_watched)
+        with open(config.TELEMETRYPATH, 'w') as f:
+            json.dump(data, f)
+
+    def reset(self):
+        self.recommendations = {}
+        self.recommmended_movies_watched = 0
+        self.total_recommendations = 0
+        self.recommmended_movies_positive_rating = 0
+        self.total_recommendations_rated = 0
+        self.average_watch_time_proportion = 0
+        self.num_movies_watched = 0
+        self.total_rank_movie_watched = 0
+
