@@ -1,9 +1,9 @@
 import requests
+import json
+import time
 from kafka import KafkaConsumer
 
 from src import config
-import json
-import time
 
 
 class online_evaluation:
