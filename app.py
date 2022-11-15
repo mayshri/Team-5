@@ -1,5 +1,5 @@
-from flask import Flask, Response
 from apscheduler.scheduler import Scheduler
+from flask import Flask, Response
 
 from src import config
 from src.model import Model
@@ -11,13 +11,14 @@ app = Flask(__name__)
 # (`git pull`) on the server
 backup_model = Model(config.GIT_MODEL)
 
-live_model = Model()
-canary_model = Model()
+live_model = Model(config.LIVE_MODEL)
+canary_model = Model(config.CANARY_MODEL)
 
 
 cron = Scheduler(daemon=True)
 # Explicitly kick off the background thread
 cron.start()
+
 
 # every 15 minutes, the flask app will check for
 @cron.interval_schedule(minutes=15)

@@ -1,6 +1,8 @@
+from pathlib import Path
+from typing import Optional, Set
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 import torch
 from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
@@ -8,8 +10,6 @@ from spotlight.interactions import Interactions
 from spotlight.sequence.implicit import ImplicitSequenceModel
 
 from src import config, utils
-
-from typing import Set
 
 
 class ModelNotAvailable(Exception):
@@ -46,8 +46,8 @@ class Model:
         self.model: ImplicitSequenceModel = None
         self.interactions: pd.DataFrame = None
         self.movie_map: pd.DataFrame = None
-        self.top_20: str = None
-        self.users: Set = None
+        self.top_20: Optional[str] = None
+        self.users: Optional[Set] = None
 
         self.reload()
 
