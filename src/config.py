@@ -2,14 +2,14 @@ from pathlib import Path
 
 SEED = 42
 
-MODELSFOLDER = Path(__file__).parents[1] / "models"
-MODEL = MODELSFOLDER / "model.pt"
-MOVIEMAP = MODELSFOLDER / "movie_map.csv"
+# filenames
+MODEL_NAME = "model.pt"
+MOVIE_MAP = "movie_map.csv"
+INTERACTIONS = "interactions.csv"
+KAFKA_DUMP = "kafka-dump.csv"
+VERIFIED_MOVIES = "verified_movie.csv"
 
-DATAFOLDER = Path(__file__).parents[1] / "data"
-INTERACTIONS = DATAFOLDER / "interactions.csv"
-DUMP = DATAFOLDER / "kafka-dump.csv"
-VERIFY = DATAFOLDER / "verified_movie.csv"
+GIT_MODEL = Path(__file__).parents[1] / "models"
 
 METRICSFOLDER = Path(__file__).parents[1] / "metrics"
 RECOMMENDEDMOVIEWATCHRATE = METRICSFOLDER / "recommended_movie_watch_rate.txt"
