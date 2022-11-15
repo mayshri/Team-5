@@ -11,9 +11,11 @@ VERIFIED_MOVIES = "verified_movie.csv"
 
 GIT_MODEL = Path(__file__).parents[1] / "models"
 
+# !! if this changes, it needs to change in the deployment.yml as well
 DEPLOYED_MODELS = Path(__file__).parents[1] / "deployed_models"
 LIVE_MODEL = DEPLOYED_MODELS / "live"
 CANARY_MODEL = DEPLOYED_MODELS / "canary"
+# !!
 
 METRICSFOLDER = Path(__file__).parents[1] / "metrics"
 RECOMMENDEDMOVIEWATCHRATE = METRICSFOLDER / "recommended_movie_watch_rate.txt"

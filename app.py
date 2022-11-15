@@ -21,6 +21,8 @@ cron.start()
 
 
 # every 15 minutes, the flask app will check for
+# updates to the models, and will update the
+# respective models as necessary
 @cron.interval_schedule(minutes=15)
 def reload_models():
     live_model.reload()

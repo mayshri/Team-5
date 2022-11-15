@@ -3,13 +3,13 @@ from unittest import TestCase
 import numpy as np
 
 from src.model import Model
+from src.config import GIT_MODEL
 
 
 class TestModel(TestCase):
     def test_pretrained_model_evaluation(self):
 
-        model = Model()
-        model.load_model()
+        model = Model(GIT_MODEL)
 
         _, test = model.load_interactions()
 
@@ -21,7 +21,7 @@ class TestModel(TestCase):
         print(f"\n Model worst MRR score: {min(mrr_scores)} \n")
 
     def test_model_training_and_evaluation(self):
-        model = Model()
+        model = Model(GIT_MODEL)
 
         train, test = model.load_interactions()
         model.fit(train)
