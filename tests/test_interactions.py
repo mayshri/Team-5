@@ -3,13 +3,13 @@ from unittest import TestCase
 
 import pandas as pd
 
-from src.config import INTERACTIONS
+from src.config import GIT_MODEL, INTERACTIONS
 
 
 class TestInteractions(TestCase):
     def test_movie_id(self):
 
-        interactions = pd.read_csv(INTERACTIONS)
+        interactions = pd.read_csv(GIT_MODEL / INTERACTIONS)
 
         self.assertEqual(
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
@@ -34,7 +34,7 @@ class TestInteractions(TestCase):
 
     def test_timestamp(self):
 
-        interactions = pd.read_csv(INTERACTIONS)
+        interactions = pd.read_csv(GIT_MODEL / INTERACTIONS)
 
         self.assertEqual(
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
@@ -50,7 +50,7 @@ class TestInteractions(TestCase):
 
     def test_user_id_is_numeric(self):
 
-        interactions = pd.read_csv(INTERACTIONS, dtype=str)
+        interactions = pd.read_csv(GIT_MODEL / INTERACTIONS, dtype=str)
         self.assertEqual(
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
         )
@@ -60,7 +60,7 @@ class TestInteractions(TestCase):
 
     def test_user_id_is_valid(self):
 
-        interactions = pd.read_csv(INTERACTIONS)
+        interactions = pd.read_csv(GIT_MODEL / INTERACTIONS)
 
         self.assertEqual(
             set(interactions.columns), {"timestamp", "user_id", "movie_id"}
