@@ -14,5 +14,5 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
       - name: Deploy with mv
         run: |
-          ssh team-5@@fall2022-comp585-5.cs.mcgill.ca
+          ssh team-5@@fall2022-comp585-5.cs.mcgill.ca -i ~/.ssh/id_rsa
           mv Team-5/deployed_models/canary Team-5/deployed_models/live
