@@ -17,4 +17,5 @@ jobs:
           ssh-keyscan -H fall2022-comp585-5.cs.mcgill.ca > ~/.ssh/known_hosts
       - name: Deploy with mv
         run: |
+          git describe --always > models/git_commit.txt
           scp -vv -i ~/.ssh/id_rsa -r models team-5@fall2022-comp585-5.cs.mcgill.ca:~/Team-5/deployed_models/canary
