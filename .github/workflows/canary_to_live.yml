@@ -13,9 +13,6 @@ jobs:
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H fall2022-comp585-5.cs.mcgill.ca > ~/.ssh/known_hosts
-          ls -la /dev/tty
-          chmod 666 /dev/tty
       - name: Deploy with mv
         run: |
-          ssh -vv -i ~/.ssh/id_rsa team-5@@fall2022-comp585-5.cs.mcgill.ca
-          mv Team-5/deployed_models/canary Team-5/deployed_models/live
+          ssh -vv team-5@@fall2022-comp585-5.cs.mcgill.ca -i ~/.ssh/id_rsa
