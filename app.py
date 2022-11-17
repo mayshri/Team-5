@@ -6,11 +6,6 @@ from src.model import Model
 
 app = Flask(__name__)
 
-# this backup model does not get updated during
-# deployment, since we will not be updating git
-# (`git pull`) on the server
-backup_model = Model(config.GIT_MODEL)
-
 live_model = Model(config.LIVE_MODEL)
 canary_model = Model(config.CANARY_MODEL)
 
@@ -38,10 +33,10 @@ def metric():
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
-    try:
-        if int(userid[-1]) <= 2:
+    if int(userid[-1]) <= 2:
+        try:
             return canary_model.recommend(int(userid))
-        else:
+        except Exception:
             return live_model.recommend(int(userid))
-    except Exception:
-        return backup_model.recommend(int(userid))
+    else:
+        return live_model.recommend(int(userid))
