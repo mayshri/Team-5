@@ -1,10 +1,12 @@
-from github import Github
-from pathlib import Path
 import datetime
+from pathlib import Path
+
+from github import Github
+
 
 # Class to push github commit
 class GithubClient:
-    def __init__(self, token = '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'):
+    def __init__(self, token="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"):
         self.token = token
         self.g = Github(self.token)
         self.repo = self.g.get_repo("COMP585Fall2022/Team-5")
