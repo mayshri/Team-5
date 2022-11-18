@@ -2,7 +2,7 @@ import time
 from kafka import KafkaConsumer
 from src.process import check_timestamp, ProcessDumps
 import pandas as pd
-from scripts.github import GithubClient
+from src.github import GithubClient
 from src import config
 
 class OnlineTraining:
@@ -21,7 +21,7 @@ class OnlineTraining:
         interactions_df.drop_duplicates(subset=['user_id', 'movie_id'], inplace=True)
         interactions_df.to_csv(config.INTERACTIONS_PATH, index=False)
 
-        self.github.update_file(config.INTERACTIONS_PATH)
+        self.github.update_file(config.INTERACTIONS_PATH, "[ONLINE TRAINING] Update interactions - " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         self.entries = []
         self.last_update = time.time()

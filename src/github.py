@@ -9,7 +9,7 @@ class GithubClient:
         self.g = Github(self.token)
         self.repo = self.g.get_repo("COMP585Fall2022/Team-5")
 
-    def update_file(self, file_path):
+    def update_file(self, file_path, commit_msg):
         content = Path(file_path).read_text()
         repo_file = self.repo.get_contents(str(file_path))
-        self.repo.update_file(repo_file.path, "[ONLINE TRAINING] Update interactions - " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), content, repo_file.sha)
+        self.repo.update_file(repo_file.path, commit_msg, content, repo_file.sha)
