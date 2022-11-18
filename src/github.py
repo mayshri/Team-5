@@ -1,4 +1,3 @@
-import datetime
 from pathlib import Path
 
 from github import Github
