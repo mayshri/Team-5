@@ -12,6 +12,8 @@ from src.process import ProcessDumps, check_timestamp
 class OnlineTraining:
     def __init__(self, timeinterval):
         self.timeinterval = timeinterval
+        self.max_interactions = 10000000
+
         self.entries = []
         self.last_update = time.time()
         self.github = GithubClient()
@@ -27,7 +29,13 @@ class OnlineTraining:
             [existing_interactions_df, new_interactions_df], ignore_index=True
         )
         interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
-        interactions_df.to_csv(config.INTERACTIONS_PATH, index=False)
+
+        # Handle the case where the number of interactions is too large
+        # by keeping only the most recent interactions
+        overflow = interactions_df.shape[0] - self.max_interactions
+        if(overflow > 0):
+            interactions_df = interactions_df.iloc[overflow:]
+            interactions_df.to_csv(config.INTERACTIONS_PATH, index=False)
 
         self.github.update_file(
             config.INTERACTIONS_PATH,
