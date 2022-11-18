@@ -33,7 +33,7 @@ class OnlineTraining:
         # Handle the case where the number of interactions is too large
         # by keeping only the most recent interactions
         overflow = interactions_df.shape[0] - self.max_interactions
-        if(overflow > 0):
+        if overflow > 0:
             interactions_df = interactions_df.iloc[overflow:]
             interactions_df.to_csv(config.INTERACTIONS_PATH, index=False)
 
