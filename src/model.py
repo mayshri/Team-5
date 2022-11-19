@@ -1,12 +1,63 @@
+from pathlib import Path
+from typing import Optional, Set
+
 import numpy as np
 import pandas as pd
 import torch
+import torch.optim as optim
 from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
+from spotlight.losses import adaptive_hinge_loss, bpr_loss, hinge_loss, pointwise_loss
 from spotlight.sequence.implicit import ImplicitSequenceModel
+from spotlight.sequence.representations import CNNNet, LSTMNet, MixtureLSTMNet, PoolNet
+from spotlight.torch_utils import gpu
 
 from src import config, utils
+
+
+class ModelNotAvailable(Exception):
+    pass
+
+
+def our_initialization(self, interactions):
+
+    sequences = interactions.sequences.astype(np.int64)
+    self._num_items = sequences.max() + 1
+
+    if self._representation == "pooling":
+        self._net = PoolNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "cnn":
+        self._net = CNNNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "lstm":
+        self._net = LSTMNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "mixture":
+        self._net = MixtureLSTMNet(
+            self._num_items, self._embedding_dim, sparse=self._sparse
+        )
+    else:
+        self._net = self._representation
+
+    self._net = gpu(self._net, self._use_cuda)
+
+    if self._optimizer_func is None:
+        self._optimizer = optim.Adam(
+            self._net.parameters(), weight_decay=self._l2, lr=self._learning_rate
+        )
+    else:
+        self._optimizer = self._optimizer_func(self._net.parameters())
+
+    if self._loss == "pointwise":
+        self._loss_func = pointwise_loss
+    elif self._loss == "bpr":
+        self._loss_func = bpr_loss
+    elif self._loss == "hinge":
+        self._loss_func = hinge_loss
+    else:
+        self._loss_func = adaptive_hinge_loss
+
+
+ImplicitSequenceModel._check_input = lambda *args, **kwargs: None
 
 
 class Model:
@@ -28,38 +79,57 @@ class Model:
     ```
     """
 
-    def __init__(self):
+    def __init__(self, model_folder: Path, recompute_movie_map: bool = False):
 
         utils.seed_everything(config.SEED)
-        self.model = ImplicitSequenceModel(
-            n_iter=10,
-            representation="cnn",
-            loss="bpr",
-        )
 
-        self.interactions = pd.read_csv(config.INTERACTIONS)
-        self.interactions["user_id"] = self.interactions["user_id"].astype("int32")
+        self.model_exists = False
 
-        movie_map_ids = pd.factorize(self.interactions["movie_id"])[0]
-        movie_map_ids += 1
-        self.interactions = self.interactions.assign(movie_map_id=movie_map_ids)
+        self.model_folder = model_folder
 
-        try:
-            self.movie_map = pd.read_csv(config.MOVIEMAP)
-        except FileNotFoundError:
-            self.movie_map = pd.DataFrame(
-                {
-                    "movie_id": self.interactions["movie_id"],
-                    "movie_map_id": self.interactions["movie_map_id"],
-                }
-            ).drop_duplicates()
-            self.movie_map.to_csv(config.MOVIEMAP, index=False)
+        self.model: ImplicitSequenceModel = None
+        self.interactions: pd.DataFrame = None
+        self.movie_map: pd.DataFrame = None
+        self.top_20: Optional[str] = None
+        self.users: Optional[Set] = None
 
-        self.top_20 = list(self.interactions["movie_id"].value_counts().head(20).index)
-        self.users = set(self.interactions["user_id"].unique())
+        self.reload(recompute_movie_map)
 
-    def load_model(self):
-        self.model = torch.load(config.MODEL)
+    def reload(self, recompute_movie_map: bool = False):
+        if self.model_folder.exists():
+            self.model_exists = True
+            self.model = ImplicitSequenceModel(
+                n_iter=10,
+                representation="cnn",
+                loss="bpr",
+            )
+
+            self.interactions = pd.read_csv(self.model_folder / config.INTERACTIONS)
+            self.interactions["user_id"] = self.interactions["user_id"].astype("int32")
+
+            movie_map_ids = pd.factorize(self.interactions["movie_id"])[0]
+            movie_map_ids += 1
+            self.interactions = self.interactions.assign(movie_map_id=movie_map_ids)
+            if recompute_movie_map:
+                pd.DataFrame(
+                    {
+                        "movie_id": self.interactions["movie_id"],
+                        "movie_map_id": self.interactions["movie_map_id"],
+                    }
+                ).drop_duplicates().to_csv(
+                    self.model_folder / config.MOVIE_MAP, index=False
+                )
+
+            self.movie_map = pd.read_csv(self.model_folder / config.MOVIE_MAP)
+
+            self.top_20 = self._process_predictions(
+                list(self.interactions["movie_id"].value_counts().head(20).index)
+            )
+            self.users = set(self.interactions["user_id"].unique())
+
+            self.model = torch.load(self.model_folder / config.MODEL_NAME)
+        else:
+            self.model_exists = False
 
     def load_interactions(self):
         dataset = Interactions(
@@ -74,10 +144,12 @@ class Model:
         return train, test
 
     def fit(self, train_interactions: Interactions) -> None:
+        # fit should always be saved in the git folder
         train = train_interactions.to_sequence()
+        our_initialization(self.model, train)
         self.model.fit(train, verbose=True)
         # Save model
-        torch.save(self.model, config.MODEL)
+        torch.save(self.model, config.GIT_MODEL / config.MODEL_NAME)
 
     def eval(self, test_interactions: Interactions) -> np.ndarray:
         test = test_interactions.to_sequence()
@@ -90,12 +162,23 @@ class Model:
         best_movie_id_indices = indices[np.argsort(pred[indices])]
         return [self.get_movie_id(movie) for movie in best_movie_id_indices]
 
+    @staticmethod
+    def _process_predictions(predictions):
+        result = ""
+        for i in range(20):
+            result += predictions[i]
+            result += ","
+        result = result[:-1]
+        return result
+
     def recommend(self, user_id):
-        if user_id not in self.users:
-            return self.top_20
-        else:
-            movies = self.get_user_movies_watched(user_id)
-            return self.predict(movies, 20)
+        if self.model_exists:
+            if user_id not in self.users:
+                return self.top_20
+            else:
+                movies = self.get_user_movies_watched(user_id)
+                return self._process_predictions(self.predict(movies, 20))
+        raise ModelNotAvailable
 
     def map_movie_id(self, movie_id):
         return self.movie_map[self.movie_map["movie_id"] == movie_id][

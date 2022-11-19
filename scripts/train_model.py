@@ -3,7 +3,7 @@ import os
 
 from kafka import KafkaConsumer
 
-from src.config import DUMP, MOVIEMAP
+from src.config import GIT_MODEL, KAFKA_DUMP, MOVIE_MAP
 from src.model import Model
 from src.process import ProcessDumps
 
@@ -14,7 +14,7 @@ def dump(amount: int):
 
     consumer = KafkaConsumer(topic, bootstrap_servers=[server], api_version=(0, 11, 5))
 
-    f = open(DUMP, "w")
+    f = open(GIT_MODEL / KAFKA_DUMP, "w")
     writer = csv.writer(f)
     num = 0
     for message in consumer:
@@ -27,13 +27,13 @@ def dump(amount: int):
 
 def generate_interactions(amount: int):
     dump(amount)
-    ProcessDumps.process_new_dump(DUMP)
+    ProcessDumps.process_new_dump(GIT_MODEL / KAFKA_DUMP)
 
 
 def train_model(amount: int):
-    os.remove(MOVIEMAP)
+    os.remove(GIT_MODEL / MOVIE_MAP)
     generate_interactions(amount)
-    model = Model()
+    model = Model(GIT_MODEL, recompute_movie_map=True)
     train, test = model.load_interactions()
     model.fit(train)
     mrr_scores = model.eval(test)

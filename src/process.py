@@ -7,10 +7,9 @@ from typing import Union
 import pandas as pd
 import requests
 
-from src.config import VERIFY
+from src.config import GIT_MODEL, INTERACTIONS, VERIFIED_MOVIES
 
-DATAFOLDER = Path(__file__).parents[1] / "data"
-INTERACTIONS = DATAFOLDER / "interactions.csv"
+INTERACTIONS_PATH = GIT_MODEL / INTERACTIONS
 
 
 def check_timestamp(text):
@@ -98,10 +97,10 @@ class ProcessDumps:
         )
         df = df[df.user_id.apply(lambda x: check_user_id(x))]
 
-        verify_data = pd.read_csv(VERIFY)
+        verify_data = pd.read_csv(GIT_MODEL / VERIFIED_MOVIES)
         verified_movies = verify_data["movie_id"].tolist()
 
-        with open(VERIFY, "a") as f:
+        with open(GIT_MODEL / VERIFIED_MOVIES, "a") as f:
             writer = csv.writer(f, delimiter=",")
             movielist = list(dict.fromkeys(df["movie_id"].tolist()))
             for movie_id in movielist:
@@ -120,10 +119,10 @@ class ProcessDumps:
 
         new_interactions = cls.raw_to_interactions(Path(raw_dump))
 
-        if not INTERACTIONS.exists():
-            new_interactions.to_csv(INTERACTIONS, index=False)
+        if not INTERACTIONS_PATH.exists():
+            new_interactions.to_csv(INTERACTIONS_PATH, index=False)
         else:
             combined_ratings = pd.concat(
-                [new_interactions, pd.read_csv(INTERACTIONS)]
+                [new_interactions, pd.read_csv(INTERACTIONS_PATH)]
             ).drop_duplicates()
-            combined_ratings.to_csv(INTERACTIONS, index=False)
+            combined_ratings.to_csv(INTERACTIONS_PATH, index=False)
