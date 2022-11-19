@@ -23,7 +23,8 @@ class ModelNotAvailable(Exception):
 def our_initialization(self, interactions):
 
     sequences = interactions.sequences.astype(np.int64)
-    self._num_items = sequences.max() + 1
+    # + 1 for 0, and +1 for the final index.
+    self._num_items = sequences.max() + 2
 
     if self._representation == "pooling":
         self._net = PoolNet(self._num_items, self._embedding_dim, sparse=self._sparse)
