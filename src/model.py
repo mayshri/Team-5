@@ -8,15 +8,9 @@ import torch.optim as optim
 from spotlight.cross_validation import user_based_train_test_split
 from spotlight.evaluation import sequence_mrr_score
 from spotlight.interactions import Interactions
+from spotlight.losses import adaptive_hinge_loss, bpr_loss, hinge_loss, pointwise_loss
 from spotlight.sequence.implicit import ImplicitSequenceModel
-from spotlight.losses import (adaptive_hinge_loss,
-                              bpr_loss,
-                              hinge_loss,
-                              pointwise_loss)
-from spotlight.sequence.representations import (CNNNet,
-                                                LSTMNet,
-                                                MixtureLSTMNet,
-                                                PoolNet)
+from spotlight.sequence.representations import CNNNet, LSTMNet, MixtureLSTMNet, PoolNet
 from spotlight.torch_utils import gpu
 
 from src import config, utils
@@ -31,22 +25,16 @@ def our_initialization(self, interactions):
     sequences = interactions.sequences.astype(np.int64)
     self._num_items = sequences.max() + 1
 
-    if self._representation == 'pooling':
-        self._net = PoolNet(self._num_items,
-                            self._embedding_dim,
-                            sparse=self._sparse)
-    elif self._representation == 'cnn':
-        self._net = CNNNet(self._num_items,
-                            self._embedding_dim,
-                            sparse=self._sparse)
-    elif self._representation == 'lstm':
-        self._net = LSTMNet(self._num_items,
-                            self._embedding_dim,
-                            sparse=self._sparse)
-    elif self._representation == 'mixture':
-        self._net = MixtureLSTMNet(self._num_items,
-                                    self._embedding_dim,
-                                    sparse=self._sparse)
+    if self._representation == "pooling":
+        self._net = PoolNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "cnn":
+        self._net = CNNNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "lstm":
+        self._net = LSTMNet(self._num_items, self._embedding_dim, sparse=self._sparse)
+    elif self._representation == "mixture":
+        self._net = MixtureLSTMNet(
+            self._num_items, self._embedding_dim, sparse=self._sparse
+        )
     else:
         self._net = self._representation
 
@@ -54,18 +42,16 @@ def our_initialization(self, interactions):
 
     if self._optimizer_func is None:
         self._optimizer = optim.Adam(
-            self._net.parameters(),
-            weight_decay=self._l2,
-            lr=self._learning_rate
+            self._net.parameters(), weight_decay=self._l2, lr=self._learning_rate
         )
     else:
         self._optimizer = self._optimizer_func(self._net.parameters())
 
-    if self._loss == 'pointwise':
+    if self._loss == "pointwise":
         self._loss_func = pointwise_loss
-    elif self._loss == 'bpr':
+    elif self._loss == "bpr":
         self._loss_func = bpr_loss
-    elif self._loss == 'hinge':
+    elif self._loss == "hinge":
         self._loss_func = hinge_loss
     else:
         self._loss_func = adaptive_hinge_loss
@@ -126,8 +112,13 @@ class Model:
             self.interactions = self.interactions.assign(movie_map_id=movie_map_ids)
             if recompute_movie_map:
                 pd.DataFrame(
-                    {"movie_id": self.interactions["movie_id"], "movie_map_id": self.interactions["movie_map_id"]}
-                ).drop_duplicates().to_csv(self.model_folder / config.MOVIE_MAP, index=False)
+                    {
+                        "movie_id": self.interactions["movie_id"],
+                        "movie_map_id": self.interactions["movie_map_id"],
+                    }
+                ).drop_duplicates().to_csv(
+                    self.model_folder / config.MOVIE_MAP, index=False
+                )
 
             self.movie_map = pd.read_csv(self.model_folder / config.MOVIE_MAP)
 
