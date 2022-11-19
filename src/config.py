@@ -26,3 +26,5 @@ RECOMMENDEDWATCHBYTOTALWATCH = METRICSFOLDER / "recommended_by_total.txt"
 METRICFILE = METRICSFOLDER / "metrics.txt"
 
 TELEMETRYPATH = METRICSFOLDER / "telemetry.json"
+
+INTERACTIONS_PATH = "models/interactions.csv"
