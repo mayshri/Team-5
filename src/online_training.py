@@ -35,7 +35,7 @@ class OnlineTraining:
         overflow = interactions_df.shape[0] - self.max_interactions
         if overflow > 0:
             interactions_df = interactions_df.iloc[overflow:]
-        
+
         interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
 
         self.github.update_file(
