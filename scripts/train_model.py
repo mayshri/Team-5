@@ -33,7 +33,7 @@ def generate_interactions(amount: int):
 def train_model(amount: int):
     os.remove(GIT_MODEL / MOVIE_MAP)
     generate_interactions(amount)
-    model = Model(GIT_MODEL)
+    model = Model(GIT_MODEL, recompute_movie_map=True)
     train, test = model.load_interactions()
     model.fit(train)
     mrr_scores = model.eval(test)
