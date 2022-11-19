@@ -23,7 +23,7 @@ class OnlineTraining:
         new_interactions_df = pd.DataFrame(
             self.entries, columns=["timestamp", "user_id", "movie_id"]
         )
-        existing_interactions_df = pd.read_csv(config.INTERACTIONS_PATH)
+        existing_interactions_df = pd.read_csv(config.GIT_MODEL / config.INTERACTIONS)
 
         interactions_df = pd.concat(
             [existing_interactions_df, new_interactions_df], ignore_index=True
@@ -35,7 +35,8 @@ class OnlineTraining:
         overflow = interactions_df.shape[0] - self.max_interactions
         if overflow > 0:
             interactions_df = interactions_df.iloc[overflow:]
-            interactions_df.to_csv(config.INTERACTIONS_PATH, index=False)
+        
+        interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
 
         self.github.update_file(
             config.INTERACTIONS_PATH,
