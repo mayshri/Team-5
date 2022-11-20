@@ -3,8 +3,8 @@ import os
 
 from kafka import KafkaConsumer
 
+from src.config import GIT_MODEL, KAFKA_DUMP, MOVIE_MAP
 from src.inference.model import Model
-from src.utils.config import GIT_MODEL, KAFKA_DUMP, MOVIE_MAP
 from src.utils.process import ProcessDumps
 
 

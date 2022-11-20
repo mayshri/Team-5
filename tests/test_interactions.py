@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from src.utils.config import GIT_MODEL, INTERACTIONS
+from src.config import GIT_MODEL, INTERACTIONS
 
 
 class TestInteractions(TestCase):

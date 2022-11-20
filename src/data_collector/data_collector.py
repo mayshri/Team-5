@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from kafka import KafkaConsumer
 
-from src.utils import config
+from src import config
 from src.utils.github import GithubClient
 from src.utils.process import ProcessDumps, check_timestamp
 

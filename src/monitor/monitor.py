@@ -5,7 +5,7 @@ from collections import defaultdict
 import requests
 from kafka import KafkaConsumer
 
-from src.utils import config
+from src import config
 from src.utils.process import check_movie_id, check_timestamp, check_user_id
 
 

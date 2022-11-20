@@ -3,7 +3,7 @@ from pathlib import Path
 from github import Github
 
 
-# Class to push github commit
+# Class to push GitHub commit
 class GithubClient:
     def __init__(self, token="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"):
         self.token = token

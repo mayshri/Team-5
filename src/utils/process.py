@@ -7,7 +7,7 @@ from typing import Union
 import pandas as pd
 import requests
 
-from src.utils.config import GIT_MODEL, INTERACTIONS, VERIFIED_MOVIES
+from src.config import GIT_MODEL, INTERACTIONS, VERIFIED_MOVIES
 
 INTERACTIONS_PATH = GIT_MODEL / INTERACTIONS
 
@@ -37,13 +37,6 @@ def check_movie_id(movie_id):
 
 
 class ProcessDumps:
-    """
-    Usage:
-    ```
-    >>> from src.process import ProcessDumps
-    >>> ProcessDumps.process_new_dump("data_collector/kafka-dump.csv")
-    ```
-    """
 
     """
     @staticmethod
@@ -83,9 +76,9 @@ class ProcessDumps:
         df.columns = ["timestamp", "user_id", "request"]
 
         # Filter by 'rating' requests
-        df = df.loc[df["request"].str.find("/data_collector/") != -1]
+        df = df.loc[df["request"].str.find("/data/") != -1]
 
-        # Clean data_collector
+        # Clean data
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
         df["timestamp"] = df["timestamp"].map(lambda x: x.replace("b'", ""))
         df = df[df.timestamp.apply(lambda x: check_timestamp(x))]
