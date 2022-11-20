@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from src.monitor.monitor import OnlineEvaluation
 
 if __name__ == "__main__":

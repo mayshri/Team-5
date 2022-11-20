@@ -1,16 +1,37 @@
 from pathlib import Path
+import github
+import base64
 
-from github import Github
-
-
-# Class to push GitHub commit
+# Class to push github commit
 class GithubClient:
-    def __init__(self, token="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"):
+    def __init__(self, token=""):
         self.token = token
-        self.g = Github(self.token)
+        self.g = github.Github(self.token)
         self.repo = self.g.get_repo("COMP585Fall2022/Team-5")
 
     def update_file(self, file_path, commit_msg):
         content = Path(file_path).read_text()
         repo_file = self.repo.get_contents(str(file_path))
         self.repo.update_file(repo_file.path, commit_msg, content, repo_file.sha)
+
+    def update_files(self, file_paths, commit_msg):
+        elements = []
+
+        for file_path, file_format in file_paths:
+            print(file_path, file_format)
+            if file_format == 'base64':
+                content = base64.b64encode(open(Path(file_path), "rb").read())
+                content = content.decode("utf-8")
+            else:
+                content = Path(file_path).read_text()
+            blob = self.repo.create_git_blob(content, file_format)
+            element = github.InputGitTreeElement(path=file_path, mode='100644', type='blob', sha=blob.sha)
+            elements.append(element)
+
+        head_sha = self.repo.get_branch('main').commit.sha
+        base_tree = self.repo.get_git_tree(sha=head_sha)
+        tree = self.repo.create_git_tree(elements, base_tree)
+        parent = self.repo.get_git_commit(sha=head_sha)
+        commit = self.repo.create_git_commit(commit_msg, tree, [parent])
+        main_ref = self.repo.get_git_ref('heads/main')
+        main_ref.edit(sha=commit.sha)

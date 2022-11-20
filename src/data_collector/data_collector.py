@@ -7,6 +7,7 @@ from kafka import KafkaConsumer
 from src import config
 from src.utils.github import GithubClient
 from src.utils.process import ProcessDumps, check_timestamp
+from src.training.training import online_model_training
 
 
 class OnlineTraining:
@@ -29,6 +30,7 @@ class OnlineTraining:
             [existing_interactions_df, new_interactions_df], ignore_index=True
         )
         interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
+        interactions_df = interactions_df[pd.to_numeric(interactions_df['user_id'], errors='coerce').notnull()]
 
         # Handle the case where the number of interactions is too large
         # by keeping only the most recent interactions
@@ -37,12 +39,17 @@ class OnlineTraining:
             interactions_df = interactions_df.iloc[overflow:]
 
         interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
+        
+        # Train the model with the new interactions
+        online_model_training()
 
-        self.github.update_file(
-            config.INTERACTIONS_PATH,
-            "[ONLINE TRAINING] Update interactions - "
+        self.github.update_files(
+            [(config.INTERACTIONS_PATH, 'utf-8'), (config.MODEL_PATH, 'base64'), (config.MOVIE_MAP_PATH, 'utf-8')],
+            "[ONLINE TRAINING] Update Interactions / Model / Movie Map - "
             + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
+
+        print('Online Training: Updated Interactions / Model / Movie Map')
 
         self.entries = []
         self.last_update = time.time()
@@ -71,5 +78,5 @@ class OnlineTraining:
             msg = message.value.decode("utf-8")
             if self.last_update + self.timeinterval < time.time():
                 self.save_entries()
-            elif msg.find("/data_collector/") != -1:
+            elif msg.find("/data/") != -1:
                 self.parse_entry(msg)
