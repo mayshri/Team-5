@@ -71,5 +71,5 @@ class OnlineTraining:
             msg = message.value.decode("utf-8")
             if self.last_update + self.timeinterval < time.time():
                 self.save_entries()
-            elif msg.find("/data_collector/") != -1:
+            elif msg.find("/data/") != -1:
                 self.parse_entry(msg)

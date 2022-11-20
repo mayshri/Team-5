@@ -49,7 +49,7 @@ class OnlineEvaluation:
         if check_user_id(user_id) is False:
             return
 
-        # If length is <= 3 then the request is either a /data_collector/ or /rate/ request
+        # If length is <= 3 then the request is either a /data/ or /rate/ request
 
         if len(parsed) <= 3:
 
@@ -59,15 +59,15 @@ class OnlineEvaluation:
                 user_id
             )  # Get all recommendations for this user
             # If the user has no recommendations, then we return
-            # as we don't make use of this data_collector
+            # as we don't make use of this data
 
             if user_recommendations is None:
                 return
 
-            # If it is a /data_collector/ request, we want to
+            # If it is a /data/ request, we want to
             # compute the "Recommended Movie Watch Rate" &
             # "Average watch time proportion" & "Average watched movie rank"
-            if parsed[2].find("/data_collector/") != -1:
+            if parsed[2].find("/data/") != -1:
                 movie_id = parsed[2].split("/")[3]
 
                 if not check_movie_id(movie_id):
