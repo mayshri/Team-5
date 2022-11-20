@@ -1,7 +1,7 @@
 from pathlib import Path
 from unittest import TestCase
 
-from src.process import ProcessDumps
+from src.utils.process import ProcessDumps
 
 
 class TestProcess(TestCase):

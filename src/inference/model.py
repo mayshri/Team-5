@@ -13,7 +13,8 @@ from spotlight.sequence.implicit import ImplicitSequenceModel
 from spotlight.sequence.representations import CNNNet, LSTMNet, MixtureLSTMNet, PoolNet
 from spotlight.torch_utils import gpu
 
-from src import config, utils
+from src import utils
+from src.utils import config
 
 
 class ModelNotAvailable(Exception):

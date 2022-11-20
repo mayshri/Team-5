@@ -3,9 +3,9 @@ import os
 
 from kafka import KafkaConsumer
 
-from src.config import GIT_MODEL, KAFKA_DUMP, MOVIE_MAP
-from src.model import Model
-from src.process import ProcessDumps
+from src.utils.config import GIT_MODEL, KAFKA_DUMP, MOVIE_MAP
+from src.inference.model import Model
+from src.utils.process import ProcessDumps
 
 
 def dump(amount: int):

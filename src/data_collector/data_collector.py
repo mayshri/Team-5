@@ -4,9 +4,9 @@ import time
 import pandas as pd
 from kafka import KafkaConsumer
 
-from src import config
-from src.github import GithubClient
-from src.process import ProcessDumps, check_timestamp
+from src.utils import config
+from src.utils.github import GithubClient
+from src.utils.process import ProcessDumps, check_timestamp
 
 
 class OnlineTraining:
@@ -71,5 +71,5 @@ class OnlineTraining:
             msg = message.value.decode("utf-8")
             if self.last_update + self.timeinterval < time.time():
                 self.save_entries()
-            elif msg.find("/data/") != -1:
+            elif msg.find("/data_collector/") != -1:
                 self.parse_entry(msg)

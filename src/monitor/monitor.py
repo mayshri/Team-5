@@ -5,8 +5,8 @@ from collections import defaultdict
 import requests
 from kafka import KafkaConsumer
 
-from src import config
-from src.process import check_movie_id, check_timestamp, check_user_id
+from src.utils import config
+from src.utils.process import check_movie_id, check_timestamp, check_user_id
 
 
 def multi_dict(n, type):
@@ -49,7 +49,7 @@ class OnlineEvaluation:
         if check_user_id(user_id) is False:
             return
 
-        # If length is <= 3 then the request is either a /data/ or /rate/ request
+        # If length is <= 3 then the request is either a /data_collector/ or /rate/ request
 
         if len(parsed) <= 3:
 
@@ -58,14 +58,14 @@ class OnlineEvaluation:
             user_recommendations = self.recommendations.get(
                 user_id
             )  # Get all recommendations for this user
-            # If the user has no recommendations, then we return as we don't make use of this data
+            # If the user has no recommendations, then we return as we don't make use of this data_collector
 
             if user_recommendations is None:
                 return
 
-            # If it is a /data/ request, we want to compute the "Recommended Movie Watch Rate" &
+            # If it is a /data_collector/ request, we want to compute the "Recommended Movie Watch Rate" &
             # "Average watch time proportion" & "Average watched movie rank"
-            if parsed[2].find("/data/") != -1:
+            if parsed[2].find("/data_collector/") != -1:
                 movie_id = parsed[2].split("/")[3]
 
                 if not check_movie_id(movie_id):

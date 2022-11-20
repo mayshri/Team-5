@@ -7,7 +7,7 @@ from typing import Union
 import pandas as pd
 import requests
 
-from src.config import GIT_MODEL, INTERACTIONS, VERIFIED_MOVIES
+from src.utils.config import GIT_MODEL, INTERACTIONS, VERIFIED_MOVIES
 
 INTERACTIONS_PATH = GIT_MODEL / INTERACTIONS
 
@@ -41,7 +41,7 @@ class ProcessDumps:
     Usage:
     ```
     >>> from src.process import ProcessDumps
-    >>> ProcessDumps.process_new_dump("data/kafka-dump.csv")
+    >>> ProcessDumps.process_new_dump("data_collector/kafka-dump.csv")
     ```
     """
 
@@ -50,14 +50,14 @@ class ProcessDumps:
     def raw_to_ratings(raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
 
-        data = dump_df[6]
-        df = data.str.split(",", 2, expand=True)
+        data_collector = dump_df[6]
+        df = data_collector.str.split(",", 2, expand=True)
         df.columns = ["timestamp", "user_id", "request"]
 
         # Filter by 'rating' requests
         df = df.loc[df["request"].str.find("/rate/") != -1]
 
-        # Clean data
+        # Clean data_collector
         df[["request", "rating"]] = df["request"].str.split("=", expand=True)
         df["movie_id"] = df["request"].str.split("/", expand=True)[2]
         df["rating"] = df["rating"].map(lambda x: x.rstrip("'"))
@@ -83,9 +83,9 @@ class ProcessDumps:
         df.columns = ["timestamp", "user_id", "request"]
 
         # Filter by 'rating' requests
-        df = df.loc[df["request"].str.find("/data/") != -1]
+        df = df.loc[df["request"].str.find("/data_collector/") != -1]
 
-        # Clean data
+        # Clean data_collector
         df["movie_id"] = df["request"].str.split("/", expand=True)[3]
         df["timestamp"] = df["timestamp"].map(lambda x: x.replace("b'", ""))
         df = df[df.timestamp.apply(lambda x: check_timestamp(x))]

@@ -1,8 +1,8 @@
 from apscheduler.scheduler import Scheduler
 from flask import Flask, Response
 
-from src import config
-from src.model import Model
+from src.utils import config
+from src.inference.model import Model
 
 app = Flask(__name__)
 
