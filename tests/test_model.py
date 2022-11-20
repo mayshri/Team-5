@@ -2,8 +2,8 @@ from unittest import TestCase
 
 import numpy as np
 
-from src.utils.config import GIT_MODEL
 from src.inference.model import Model
+from src.utils.config import GIT_MODEL
 
 
 class TestModel(TestCase):

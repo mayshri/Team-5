@@ -58,12 +58,14 @@ class OnlineEvaluation:
             user_recommendations = self.recommendations.get(
                 user_id
             )  # Get all recommendations for this user
-            # If the user has no recommendations, then we return as we don't make use of this data_collector
+            # If the user has no recommendations, then we return
+            # as we don't make use of this data_collector
 
             if user_recommendations is None:
                 return
 
-            # If it is a /data_collector/ request, we want to compute the "Recommended Movie Watch Rate" &
+            # If it is a /data_collector/ request, we want to
+            # compute the "Recommended Movie Watch Rate" &
             # "Average watch time proportion" & "Average watched movie rank"
             if parsed[2].find("/data_collector/") != -1:
                 movie_id = parsed[2].split("/")[3]

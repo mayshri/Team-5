@@ -13,8 +13,7 @@ from spotlight.sequence.implicit import ImplicitSequenceModel
 from spotlight.sequence.representations import CNNNet, LSTMNet, MixtureLSTMNet, PoolNet
 from spotlight.torch_utils import gpu
 
-from src import utils
-from src.utils import config
+from src.utils import config, seed
 
 
 class ModelNotAvailable(Exception):
@@ -83,7 +82,7 @@ class Model:
 
     def __init__(self, model_folder: Path, recompute_movie_map: bool = False):
 
-        utils.seed_everything(config.SEED)
+        seed.seed_everything(config.SEED)
 
         self.model_exists = False
 
