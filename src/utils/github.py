@@ -1,8 +1,9 @@
-from pathlib import Path
-import github
 import base64
+from pathlib import Path
 
-# Class to push github commit
+import github
+
+
 class GithubClient:
     def __init__(self, token=""):
         self.token = token
@@ -19,19 +20,21 @@ class GithubClient:
 
         for file_path, file_format in file_paths:
             print(file_path, file_format)
-            if file_format == 'base64':
+            if file_format == "base64":
                 content = base64.b64encode(open(Path(file_path), "rb").read())
                 content = content.decode("utf-8")
             else:
                 content = Path(file_path).read_text()
             blob = self.repo.create_git_blob(content, file_format)
-            element = github.InputGitTreeElement(path=file_path, mode='100644', type='blob', sha=blob.sha)
+            element = github.InputGitTreeElement(
+                path=file_path, mode="100644", type="blob", sha=blob.sha
+            )
             elements.append(element)
 
-        head_sha = self.repo.get_branch('main').commit.sha
+        head_sha = self.repo.get_branch("main").commit.sha
         base_tree = self.repo.get_git_tree(sha=head_sha)
         tree = self.repo.create_git_tree(elements, base_tree)
         parent = self.repo.get_git_commit(sha=head_sha)
         commit = self.repo.create_git_commit(commit_msg, tree, [parent])
-        main_ref = self.repo.get_git_ref('heads/main')
+        main_ref = self.repo.get_git_ref("heads/main")
         main_ref.edit(sha=commit.sha)

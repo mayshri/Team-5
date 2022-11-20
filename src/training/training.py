@@ -1,6 +1,8 @@
-from src.config import GIT_MODEL, MOVIE_MAP
 import os
+
+from src.config import GIT_MODEL, MOVIE_MAP
 from src.inference.model import Model
+
 
 def online_model_training():
     os.remove(GIT_MODEL / MOVIE_MAP)
