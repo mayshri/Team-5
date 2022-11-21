@@ -24,7 +24,7 @@ def response(userid: str):
                 "the+dark+knight+rises+2012,fight+club+1999,"
                 "howls+moving+castle+2004,whisper+of+the+heart+1995 "
             )
-    except:
+    except Exception:
         # send email here
         return (
             "the+shawshank+redemption+1994,interstellar+2014,"
@@ -45,4 +45,3 @@ def ask_inference(userid: str):
     reply = requests.get("http://inference:5001/" + userid)
     content, status_code = reply.content, reply.status_code
     return content, status_code
-
