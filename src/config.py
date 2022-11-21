@@ -29,4 +29,6 @@ TELEMETRYPATH = METRICSFOLDER / "telemetry.json"
 
 INTERACTIONS_PATH = "models/interactions.csv"
 
-API_KEY = METRICSFOLDER = Path(__file__).parents[1] / "src" / "utils" / "SENDGRID_API_KEY.txt"
+API_KEY = METRICSFOLDER = (
+    Path(__file__).parents[1] / "src" / "utils" / "SENDGRID_API_KEY.txt"
+)
