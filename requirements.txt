@@ -14,3 +14,4 @@ Flask==2.2.2
 requests
 PyGithub
 APScheduler
+wrapt_timeout_decorator
