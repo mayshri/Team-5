@@ -1,6 +1,8 @@
 import sendgrid
 from sendgrid.helpers.mail import Mail
+
 from src.config import API_KEY
+
 
 def send_email(subject: str, html_content: str):
     message = Mail(
