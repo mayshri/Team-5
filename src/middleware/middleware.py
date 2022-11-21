@@ -8,9 +8,9 @@ app = Flask(__name__)
 @app.route("/recommend/<userid>")
 def response(userid: str):
     try:
-        reply = ask_inference(userid)
-        if reply.status_code == 200:
-            return reply.content
+        content, status_code = ask_inference(userid)
+        if status_code == 200:
+            return content
         else:
             return (
                 "the+shawshank+redemption+1994,interstellar+2014,"
@@ -24,7 +24,7 @@ def response(userid: str):
                 "the+dark+knight+rises+2012,fight+club+1999,"
                 "howls+moving+castle+2004,whisper+of+the+heart+1995 "
             )
-    except Exception:
+    except:
         # send email here
         return (
             "the+shawshank+redemption+1994,interstellar+2014,"
@@ -43,4 +43,6 @@ def response(userid: str):
 @timeout(0.3)
 def ask_inference(userid: str):
     reply = requests.get("http://inference:5001/" + userid)
-    return reply
+    content, status_code = reply.content, reply.status_code
+    return content, status_code
+
