@@ -1,23 +1,27 @@
-import datetime
 import time
 
 import pandas as pd
 from kafka import KafkaConsumer
 
 from src import config
-from src.utils.github import GithubClient
-from src.utils.process import ProcessDumps, check_timestamp
+from src.utils.process import (
+    ProcessDumps,
+    check_movie_id,
+    check_timestamp,
+    check_user_id,
+)
 
 
-class OnlineTraining:
-    def __init__(self, timeinterval):
-        self.timeinterval = timeinterval
-        self.max_interactions = 10000000
-
+class DataCollector:
+    def __init__(self, save_period, max_interactions):
+        self.save_period = save_period
+        self.max_interactions = max_interactions
         self.entries = []
-        self.last_update = time.time()
-        self.github = GithubClient()
-        self.setup_online_training()
+        self.last_save_time = time.time()
+        self.start_data_collector()
+        self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)[
+            "movie_id"
+        ].tolist()
 
     def save_entries(self):
         new_interactions_df = pd.DataFrame(
@@ -29,7 +33,9 @@ class OnlineTraining:
             [existing_interactions_df, new_interactions_df], ignore_index=True
         )
         interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
-
+        interactions_df = interactions_df[
+            pd.to_numeric(interactions_df["user_id"], errors="coerce").notnull()
+        ]
         # Handle the case where the number of interactions is too large
         # by keeping only the most recent interactions
         overflow = interactions_df.shape[0] - self.max_interactions
@@ -37,30 +43,31 @@ class OnlineTraining:
             interactions_df = interactions_df.iloc[overflow:]
 
         interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
-
-        self.github.update_file(
-            config.INTERACTIONS_PATH,
-            "[ONLINE TRAINING] Update interactions - "
-            + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        )
-
+        new_verify_movie = pd.DataFrame({"movie_id": self.verified_movies})
+        new_verify_movie.to_csv(config.VERIFIED_MOVIES_PATH, index=False)
         self.entries = []
-        self.last_update = time.time()
+        self.last_save_time = time.time()
 
     def parse_entry(self, entry):
         df = entry.split(",")
 
+        timestamp = df[0]
         user_id = df[1]
         movie_id = df[2].split("/")[3]
-        timestamp = df[0]
 
-        if not check_timestamp(timestamp):
+        if not check_timestamp(timestamp) or not check_user_id(user_id):
             return
+
+        if movie_id not in self.verified_movies:
+            if not check_movie_id(movie_id):
+                return
+            else:
+                self.verified_movies.append(movie_id)
 
         timestamp = time.mktime(ProcessDumps.try_parsing_date(timestamp).timetuple())
         self.entries.append([timestamp, user_id, movie_id])
 
-    def setup_online_training(self):
+    def start_data_collector(self):
         server, topic = "fall2022-comp585.cs.mcgill.ca:9092", "movielog5"
 
         consumer = KafkaConsumer(
@@ -69,7 +76,11 @@ class OnlineTraining:
 
         for message in consumer:
             msg = message.value.decode("utf-8")
-            if self.last_update + self.timeinterval < time.time():
+            if self.last_save_time + self.save_period < time.time():
                 self.save_entries()
             elif msg.find("/data/") != -1:
                 self.parse_entry(msg)
+
+
+if __name__ == "__main__":
+    DataCollector(900, 10000000)
