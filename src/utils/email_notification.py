@@ -26,5 +26,5 @@ def send_email(subject: str, html_content: str):
         print(response.status_code)
         print(response.body)
         print(response.headers)
-    except Exception as e:
-        print(e.message)
+    except Exception:
+        print("Got an Exception!")
