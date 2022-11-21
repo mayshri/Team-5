@@ -27,4 +27,4 @@ jobs:
       - name: Update deployment.txt
         run: |
           echo "canary_to_live,$(date +%s),$(git describe --always)" >> deployments.txt
-          python -c "from src.utils.github import GithubClient; client = GithubClient(); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - Canary to Live')""
+          python -c "from src.utils.github import GithubClient; client = GithubClient(); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - Canary to Live')"
