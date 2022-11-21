@@ -9,9 +9,6 @@ app = Flask(__name__)
 live_model = Model(config.LIVE_MODEL)
 canary_model = Model(config.CANARY_MODEL)
 
-# 20% users will be assigned for testing the new model
-user_class_round = [[0, 5], [1, 6], [2, 7], [3, 8], [4, 9]]
-canary_round = 0
 
 cron = Scheduler(daemon=True)
 # Explicitly kick off the background thread
@@ -36,8 +33,7 @@ def metric():
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
-    # this bring more fairness
-    if int(userid[-1]) in user_class_round[canary_round % 5]:
+    if int(userid[-1]) <= 2:
         try:
             return canary_model.recommend(int(userid))
         except Exception:
