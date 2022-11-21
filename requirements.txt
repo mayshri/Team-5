@@ -14,4 +14,3 @@ Flask
 requests
 PyGithub
 wrapt_timeout_decorator
-requests
