@@ -1,17 +1,18 @@
-import os
 import datetime
+import os
 import time
+from threading import Timer
+
+from src import config
 from src.inference.model import Model
 from src.utils.github import GithubClient
-from src import config
-from threading import Timer
 
 
 class AutoTraining:
-    def __init__(self, train_period:int,instant_update=False):
+    def __init__(self, train_period: int, instant_update=False):
         self.train_period = train_period
         self.github = GithubClient()
-        self.last_train_time=time.time()
+        self.last_train_time = time.time()
 
         if instant_update:
             self.model_training()
@@ -26,8 +27,6 @@ class AutoTraining:
         train, _ = model.load_interactions()
         model.fit(train)
 
-
-
     def push_new_model(self):
         self.github.update_files(
             [
@@ -40,12 +39,14 @@ class AutoTraining:
             + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
 
-        print("Online Training: Updated Interactions / Model / Movie Map / Verified Movie")
+        print(
+            "Online Training: Updated Interactions / Model / Movie Map / Verified Movie"
+        )
 
     def auto_retrain(self):
         self.model_training()
         self.push_new_model()
-        Timer(self.train_period,self.auto_retrain).start()
+        Timer(self.train_period, self.auto_retrain).start()
 
     def set_up_autotraining(self):
         time.sleep(self.train_period)
@@ -53,4 +54,4 @@ class AutoTraining:
 
 
 if __name__ == "__main__":
-    AutoTraining(259200,True)
+    AutoTraining(259200, True)

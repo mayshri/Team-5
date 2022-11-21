@@ -1,9 +1,15 @@
 import time
+
 import pandas as pd
 from kafka import KafkaConsumer
 
 from src import config
-from src.utils.process import ProcessDumps, check_timestamp, check_user_id, check_movie_id
+from src.utils.process import (
+    ProcessDumps,
+    check_movie_id,
+    check_timestamp,
+    check_user_id,
+)
 
 
 class DataCollector:
@@ -13,7 +19,9 @@ class DataCollector:
         self.entries = []
         self.last_save_time = time.time()
         self.start_data_collector()
-        self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)["movie_id"].tolist()
+        self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)[
+            "movie_id"
+        ].tolist()
 
     def save_entries(self):
         new_interactions_df = pd.DataFrame(
@@ -35,11 +43,10 @@ class DataCollector:
             interactions_df = interactions_df.iloc[overflow:]
 
         interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
-        new_verify_movie=pd.DataFrame({'movie_id':self.verified_movies})
-        new_verify_movie.to_csv(config.VERIFIED_MOVIES_PATH,index=False)
+        new_verify_movie = pd.DataFrame({"movie_id": self.verified_movies})
+        new_verify_movie.to_csv(config.VERIFIED_MOVIES_PATH, index=False)
         self.entries = []
         self.last_save_time = time.time()
-
 
     def parse_entry(self, entry):
         df = entry.split(",")
@@ -54,7 +61,8 @@ class DataCollector:
         if movie_id not in self.verified_movies:
             if not check_movie_id(movie_id):
                 return
-            else:self.verified_movies.append(movie_id)
+            else:
+                self.verified_movies.append(movie_id)
 
         timestamp = time.mktime(ProcessDumps.try_parsing_date(timestamp).timetuple())
         self.entries.append([timestamp, user_id, movie_id])
