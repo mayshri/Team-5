@@ -189,3 +189,4 @@ files
 Pipfile
 Pipfile.lock
 data/kafka-dump.csv
+scripts/playground.py
