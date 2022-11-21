@@ -27,4 +27,4 @@ METRICFILE = METRICSFOLDER / "metrics.txt"
 
 TELEMETRYPATH = METRICSFOLDER / "telemetry.json"
 
-INTERACTIONS_PATH = "models/interactions.csv"
+INTERACTIONS_PATH = GIT_MODEL / "interactions.csv"
