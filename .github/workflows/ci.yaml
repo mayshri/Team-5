@@ -18,7 +18,8 @@ jobs:
     - name: Set up python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: '3.8'
+        cache: 'pip'
     - name: Install dependencies
       run: pip install -r requirements.txt
     - name: isort
