@@ -10,7 +10,7 @@ tqdm
 scikit-learn
 kafka-python
 git+https://github.com/maciejkula/spotlight.git#egg=spotlight
-Flask
+Flask==2.2.2
 requests
 PyGithub
 APScheduler
