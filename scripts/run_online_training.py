@@ -2,7 +2,7 @@ import sys
 
 sys.path.append(".")
 
-from src.data_collector.data_collector import OnlineTraining  # noqa: E402
+from src.data_collector.data_collector import DataCollector  # noqa: E402
 
 if __name__ == "__main__":
-    OnlineTraining(900)
+    DataCollector(900)
