@@ -18,10 +18,10 @@ class DataCollector:
         self.max_interactions = max_interactions
         self.entries = []
         self.last_save_time = time.time()
-        self.start_data_collector()
         self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)[
             "movie_id"
         ].tolist()
+        self.start_data_collector()
 
     def save_entries(self):
         new_interactions_df = pd.DataFrame(
@@ -83,4 +83,4 @@ class DataCollector:
 
 
 if __name__ == "__main__":
-    DataCollector(900, 10000000)
+    DataCollector(600, 10000000)
