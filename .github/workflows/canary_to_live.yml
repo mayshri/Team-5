@@ -8,6 +8,14 @@ jobs:
     name: Canary to Live
     runs-on: ubuntu-18.04
     steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: Create SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -16,3 +24,7 @@ jobs:
       - name: Deploy with mv
         run: |
           ssh -vv team-5@fall2022-comp585-5.cs.mcgill.ca -i ~/.ssh/id_rsa "mv ~/Team-5/deployed_models/canary ~/Team-5/deployed_models/live && exit"
+      - name: Update deployment.txt
+        run: |
+          echo "canary_to_live,$(date +%s),$(git describe --always)" >> deployments.txt
+          python -c "from src.utils.github import GithubClient; client = GithubClient(${{ secrets.MU_GITHUB_TOKEN }}); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - Canary to Live')"
