@@ -14,5 +14,5 @@ Flask==2.2.2
 requests
 PyGithub
 sendgrid
-APScheduler
+APScheduler==3.2
 wrapt_timeout_decorator

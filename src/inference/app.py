@@ -1,4 +1,4 @@
-from apscheduler.scheduler import Scheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, Response
 
 from src import config
@@ -10,7 +10,7 @@ live_model = Model(config.LIVE_MODEL)
 canary_model = Model(config.CANARY_MODEL)
 
 
-cron = Scheduler(daemon=True)
+cron = BackgroundScheduler(daemon=True)
 # Explicitly kick off the background thread
 cron.start()
 
