@@ -1,6 +1,7 @@
 import requests
 from flask import Flask
 from wrapt_timeout_decorator import timeout
+from src.utils.email_notification import send_email
 
 app = Flask(__name__)
 
@@ -12,6 +13,10 @@ def response(userid: str):
         if status_code == 200:
             return content
         else:
+            send_email(
+                "[COMP585] Middleware ultimate backup plan triggered",
+                "Middleware ultimate backup plan triggered",
+            )
             return (
                 "the+shawshank+redemption+1994,interstellar+2014,"
                 "the+lord+of+the+rings+the+fellowship+of+the+ring+2001,inception+2010,"
@@ -26,6 +31,10 @@ def response(userid: str):
             )
     except Exception:
         # send email here
+        send_email(
+            "[COMP585] Middleware ultimate backup plan triggered",
+            "Middleware ultimate backup plan triggered",
+        )
         return (
             "the+shawshank+redemption+1994,interstellar+2014,"
             "the+lord+of+the+rings+the+fellowship+of+the+ring+2001,inception+2010,"
