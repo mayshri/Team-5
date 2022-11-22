@@ -43,14 +43,14 @@ class ProcessDumps:
     def raw_to_ratings(raw_dump: Path) -> pd.DataFrame:
         dump_df = pd.read_csv(raw_dump, header=None)
 
-        data_collector = dump_df[6]
-        df = data_collector.str.split(",", 2, expand=True)
+        data = dump_df[6]
+        df = data.str.split(",", 2, expand=True)
         df.columns = ["timestamp", "user_id", "request"]
 
         # Filter by 'rating' requests
         df = df.loc[df["request"].str.find("/rate/") != -1]
 
-        # Clean data_collector
+        # Clean data
         df[["request", "rating"]] = df["request"].str.split("=", expand=True)
         df["movie_id"] = df["request"].str.split("/", expand=True)[2]
         df["rating"] = df["rating"].map(lambda x: x.rstrip("'"))
