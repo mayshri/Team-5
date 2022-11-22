@@ -1,18 +1,13 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.8-slim-buster
+FROM dependency
 
 RUN apt-get -y update
 RUN apt-get -y install git
+RUN python3 -m pip install --upgrade pip
 
-
-WORKDIR /app
-
-COPY requirements.txt requirements.txt
+WORKDIR /Team-5
+COPY . .
 RUN pip3 install -r requirements.txt
 
-COPY . .
-
-RUN chmod a+x script.sh
-
-CMD ["./script.sh"]
+WORKDIR /Team-5/src

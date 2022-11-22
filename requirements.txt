@@ -13,3 +13,5 @@ git+https://github.com/maciejkula/spotlight.git#egg=spotlight
 Flask==2.2.2
 requests
 PyGithub
+APScheduler
+wrapt_timeout_decorator
