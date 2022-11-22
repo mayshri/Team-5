@@ -1,6 +1,7 @@
 import requests
 from flask import Flask
 from wrapt_timeout_decorator import timeout
+
 from src.utils.email_notification import send_email
 
 app = Flask(__name__)

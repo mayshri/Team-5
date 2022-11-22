@@ -1,8 +1,9 @@
 import base64
 from pathlib import Path
-from src.config import GITHUB_TOKEN
 
 import github
+
+from src.config import GITHUB_TOKEN
 
 
 class GithubClient:
