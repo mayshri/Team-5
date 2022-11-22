@@ -6,6 +6,7 @@ import requests
 from kafka import KafkaConsumer
 
 from src import config
+from src.utils.email_notification import send_email
 from src.utils.process import check_movie_id, check_timestamp, check_user_id
 
 
@@ -132,8 +133,10 @@ class OnlineEvaluation:
                 self.recommendations[user_id] = movies_recommended
                 self.num_of_recommendations += 1
             else:
-                # send emergency email!!
-                pass
+                send_email(
+                    "[COMP585] Recommendation failed",
+                    "The system returned a status != 200 for a recommendation request",
+                )
         return
 
     def write_metrics(self, timestamp):
