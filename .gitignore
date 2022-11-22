@@ -190,3 +190,5 @@ Pipfile
 Pipfile.lock
 data/kafka-dump.csv
 scripts/playground.py
+src/utils/SENDGRID_API_KEY.txt
+src/utils/GITHUB_TOKEN.txt
