@@ -1,12 +1,18 @@
 import base64
 from pathlib import Path
+from src.config import GITHUB_TOKEN
 
 import github
 
 
 class GithubClient:
-    def __init__(self, token=""):
-        self.token = token
+    def __init__(self):
+        try:
+            with open(GITHUB_TOKEN, "r") as f:
+                github_token = f.readline()
+                self.token = github_token
+        except Exception:
+            print("Read github token failed")
         self.g = github.Github(self.token)
         self.repo = self.g.get_repo("COMP585Fall2022/Team-5")
 
