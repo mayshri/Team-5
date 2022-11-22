@@ -6,6 +6,7 @@ import requests
 from kafka import KafkaConsumer
 
 from src import config
+from src.utils.email_notification import send_email
 from src.utils.process import check_movie_id, check_timestamp, check_user_id
 
 
@@ -119,14 +120,23 @@ class OnlineEvaluation:
                 return
 
         if parsed[2].find("recommendation request") != -1:
-            if self.num_of_recommendations >= self.online_evaluation_threshold:
-                return
-            # Parse the movies so we only get the movies id
-            movies_recommended = parsed[4:24]
-            movies_recommended[0] = movies_recommended[0].replace("result: ", "")
-            movies_recommended = [s.strip() for s in movies_recommended]
-            self.recommendations[user_id] = movies_recommended
-            self.num_of_recommendations += 1
+
+            # check the status of the response
+            status = parsed[3]
+            if status == "status 200":
+                if self.num_of_recommendations >= self.online_evaluation_threshold:
+                    return
+                # Parse the movies so we only get the movies id
+                movies_recommended = parsed[4:24]
+                movies_recommended[0] = movies_recommended[0].replace("result: ", "")
+                movies_recommended = [s.strip() for s in movies_recommended]
+                self.recommendations[user_id] = movies_recommended
+                self.num_of_recommendations += 1
+            else:
+                send_email(
+                    "[COMP585] Recommendation failed",
+                    "The system returned a status != 200 for a recommendation request",
+                )
         return
 
     def write_metrics(self, timestamp):
