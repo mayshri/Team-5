@@ -18,7 +18,7 @@ class DataCollector:
         self.max_interactions = max_interactions
         self.entries = []
         self.last_save_time = time.time()
-        self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)[
+        self.verified_movies = pd.read_csv(config.GIT_MODEL / config.VERIFIED_MOVIES)[
             "movie_id"
         ].tolist()
         self.start_data_collector()
@@ -44,7 +44,7 @@ class DataCollector:
 
         interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
         new_verify_movie = pd.DataFrame({"movie_id": self.verified_movies})
-        new_verify_movie.to_csv(config.VERIFIED_MOVIES_PATH, index=False)
+        new_verify_movie.to_csv(config.GIT_MODEL / config.VERIFIED_MOVIES, index=False)
         self.entries = []
         self.last_save_time = time.time()
 
