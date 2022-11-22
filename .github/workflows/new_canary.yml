@@ -28,4 +28,4 @@ jobs:
       - name: Update deployment.txt
         run: |
           echo "new_canary,$(date +%s),$(git describe --always)" >> deployments.txt
-          python -c "from src.utils.github import GithubClient; client = GithubClient(); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - New Canary')"
+          python -c "from src.utils.github import GithubClient; client = GithubClient('${{ secrets.MU_GITHUB_TOKEN }}'); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - New Canary')"
