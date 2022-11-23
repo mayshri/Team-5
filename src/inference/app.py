@@ -15,7 +15,7 @@ def reload():
     try:
         live_model.reload()
         canary_model.reload()
-        #record reload here
+        # record reload here
         return "reload success"
     except Exception:
         return "reload failed"
