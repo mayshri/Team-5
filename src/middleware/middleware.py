@@ -53,7 +53,7 @@ def response(userid: str):
 
 @timeout(0.3)
 def ask_inference(userid: str):
-    reply = requests.get("http://inference:5001/" + userid)
+    reply = requests.get("http://inference:5001/recommend/" + userid)
     content, status_code = reply.content, reply.status_code
     return content, status_code
 
