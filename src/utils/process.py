@@ -30,10 +30,13 @@ def check_user_id(user_id):
 
 
 def check_movie_id(movie_id):
-    code = requests.get(
-        "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
-    ).status_code
-    return code == 200
+    try:
+        code = requests.get(
+            "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
+        ).status_code
+        return code == 200
+    except Exception:
+        return False
 
 
 class ProcessDumps:

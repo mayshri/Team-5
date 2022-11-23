@@ -11,6 +11,9 @@ services:
       - /home/team-5/Team-5/src/middleware:/middleware
     networks:
       - testnetwork
+    deploy:
+      restart_policy:
+        condition: on-failure
     command: python3 -m flask --app middleware.py run --host=0.0.0.0 --port=8081
 
   inference:
@@ -25,6 +28,9 @@ services:
       - /home/team-5/Team-5:/Team-5
     networks:
       - testnetwork
+    deploy:
+      restart_policy:
+        condition: on-failure
     command: python3 -m flask --app inference/app.py run --host=0.0.0.0 --port=5001
 
   datacollector:
@@ -35,6 +41,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
     command: python3 data_collector/data_collector.py
 
   training:
@@ -45,6 +54,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
     command: python3 training/training.py
 
     #monitoring&grafana not ready

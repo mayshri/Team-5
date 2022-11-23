@@ -10,11 +10,15 @@ canary_model = Model(config.CANARY_MODEL)
 # record the restart time stamp here.
 
 
-@app.route("/recommend/online_evaluations")
-def metric():
-    with open(config.METRICFILE, "r") as f:
-        text = f.read()
-    return Response(text, mimetype="text/plain")
+@app.route("/new_model_arrived")
+def reload():
+    try:
+        live_model.reload()
+        canary_model.reload()
+        #record reload here
+        return "reload success"
+    except Exception:
+        return "reload failed"
 
 
 @app.route("/recommend/<userid>")
