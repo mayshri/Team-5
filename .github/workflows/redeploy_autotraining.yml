@@ -1,0 +1,22 @@
+name: redeploy training
+
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - src/training
+
+jobs:
+  new-canary:
+    name: New canary
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Create SSH key
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H fall2022-comp585-5.cs.mcgill.ca > ~/.ssh/known_hosts
+      - name: Redeploy training
+        run: |
+          ssh -vv team-5@fall2022-comp585-5.cs.mcgill.ca -i ~/.ssh/id_rsa "cd /home/team-5/Team-5 && git pull origin && docker-compose restart training && exit"
