@@ -1,4 +1,4 @@
-from flask import Flask, Response
+from flask import Flask
 
 from src import config
 from src.inference.model import Model
