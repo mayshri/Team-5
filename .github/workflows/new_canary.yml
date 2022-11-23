@@ -1,7 +1,11 @@
 name: New canary
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+    - main
+    paths:
+    - models/model.pt
 
 jobs:
   new-canary:
@@ -10,12 +14,6 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v2
-      - name: Set up python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: Install dependencies
-        run: pip install -r requirements.txt
       - name: Create SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -25,7 +23,5 @@ jobs:
         run: |
           git describe --always > models/git_commit.txt
           scp -vv -i ~/.ssh/id_rsa -r models team-5@fall2022-comp585-5.cs.mcgill.ca:~/Team-5/deployed_models/canary
-      - name: Update deployment.txt
-        run: |
-          echo "new_canary,$(date +%s),$(git describe --always)" >> deployments.txt
-          python -c "from src.utils.github import GithubClient; client = GithubClient('${{ secrets.MU_GITHUB_TOKEN }}'); client.update_file('deployments.txt', '[AUTOMATED DEPLOYMENT] - New Canary')"
+          ssh -vv team-5@fall2022-comp585-5.cs.mcgill.ca -i ~/.ssh/id_rsa "cd /home/team-5/Team-5 && docker-compose restart inference && exit"
+      
