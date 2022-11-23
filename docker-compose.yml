@@ -11,9 +11,6 @@ services:
       - /home/team-5/Team-5/src/middleware:/middleware
     networks:
       - testnetwork
-    deploy:
-      restart_policy:
-          condition: always
     command: python3 -m flask --app middleware.py run --host=0.0.0.0 --port=8081
 
   inference:
@@ -28,9 +25,6 @@ services:
       - /home/team-5/Team-5:/Team-5
     networks:
       - testnetwork
-    deploy:
-      restart_policy:
-          condition: any
     command: python3 -m flask --app inference/app.py run --host=0.0.0.0 --port=5001
 
   datacollector:
