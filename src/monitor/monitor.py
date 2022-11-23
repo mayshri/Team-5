@@ -7,8 +7,9 @@ import requests
 from kafka import KafkaConsumer
 
 from src import config
-from src.utils.process import check_movie_id, check_timestamp, check_user_id
 from src.utils.email_notification import send_email
+from src.utils.process import check_movie_id, check_timestamp, check_user_id
+
 
 def multi_dict(n, type):
     if n == 1:
