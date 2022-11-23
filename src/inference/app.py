@@ -1,4 +1,3 @@
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, Response
 
 from src import config
@@ -8,20 +7,7 @@ app = Flask(__name__)
 
 live_model = Model(config.LIVE_MODEL)
 canary_model = Model(config.CANARY_MODEL)
-
-
-cron = BackgroundScheduler(daemon=True)
-# Explicitly kick off the background thread
-cron.start()
-
-
-# every 15 minutes, the flask app will check for
-# updates to the models, and will update the
-# respective models as necessary
-@cron.interval_schedule(minutes=15)
-def reload_models():
-    live_model.reload()
-    canary_model.reload()
+#record the restart time stamp here.
 
 
 @app.route("/recommend/online_evaluations")

@@ -1,0 +1,61 @@
+services:
+  middleware:
+    container_name: middleware
+    image: middleware
+    build:
+      context: /home/team-5/Team-5/src/middleware
+      dockerfile: middleware.Dockerfile
+    ports:
+      - 8081:8081
+    volumes:
+      - /home/team-5/Team-5/src/middleware:/middleware
+    networks:
+      - testnetwork
+    deploy:
+      restart_policy:
+          condition: always
+    command: python3 -m flask --app middleware.py run --host=0.0.0.0 --port=8081
+
+  inference:
+    container_name: inference
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5001:5001
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    networks:
+      - testnetwork
+    deploy:
+      restart_policy:
+          condition: any
+    command: python3 -m flask --app inference/app.py run --host=0.0.0.0 --port=5001
+
+  datacollector:
+    container_name: datacollector
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    command: python3 data_collector/data_collector.py
+
+  training:
+    container_name: training
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    command: python3 training/training.py
+
+    #monitoring&grafana not ready
+      
+networks:
+  testnetwork:
+    name: testnetwork
+    driver: bridge
