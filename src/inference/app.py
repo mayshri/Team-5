@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 live_model = Model(config.LIVE_MODEL)
 canary_model = Model(config.CANARY_MODEL)
-#record the restart time stamp here.
+# record the restart time stamp here.
 
 
 @app.route("/recommend/online_evaluations")

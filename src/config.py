@@ -16,7 +16,7 @@ GIT_MODEL = Path(__file__).parents[1] / MODELS_FOLDER
 
 # !! if this changes, it needs to change in the deployment.yml as well
 DEPLOYED_MODELS = Path(__file__).parents[1] / "deployed_models"
-LIVE_MODEL = DEPLOYED_MODELS / "live"/ MODELS_FOLDER
+LIVE_MODEL = DEPLOYED_MODELS / "live" / MODELS_FOLDER
 CANARY_MODEL = DEPLOYED_MODELS / "canary" / MODELS_FOLDER
 # !!
 

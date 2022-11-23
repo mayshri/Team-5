@@ -1,12 +1,13 @@
 import requests
-from flask import Flask
-from wrapt_timeout_decorator import timeout
 import sendgrid
+from flask import Flask
 from sendgrid.helpers.mail import Mail
+from wrapt_timeout_decorator import timeout
 
 app = Flask(__name__)
 with open("/middleware/SENDGRID_API_KEY.txt", "r") as f:
     key = f.readline()
+
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
@@ -56,6 +57,7 @@ def ask_inference(userid: str):
     reply = requests.get("http://inference:5001/recommend/" + userid)
     content, status_code = reply.content, reply.status_code
     return content, status_code
+
 
 def send_email(subject: str, html_content: str):
     message = Mail(
