@@ -1,11 +1,8 @@
 name: redeploy datacollector
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - src/datacollector
+  workflow_dispatch
+
 
 jobs:
   new-canary:

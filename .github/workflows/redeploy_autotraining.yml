@@ -1,11 +1,8 @@
 name: redeploy training
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - src/training
+  workflow_dispatch
+
 
 jobs:
   new-canary:

@@ -16,6 +16,7 @@ def reload(commit_id):
         live_model.reload()
         canary_model.reload()
         # record reload here
+        
         return "reload success"
     except Exception:
         return "reload failed"

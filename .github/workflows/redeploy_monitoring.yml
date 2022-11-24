@@ -1,11 +1,8 @@
 name: redeploy monitor
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - src/monitor
+  workflow_dispatch
+
 
 jobs:
   new-canary:

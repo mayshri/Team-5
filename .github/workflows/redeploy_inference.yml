@@ -1,11 +1,8 @@
 name: redeploy inference
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - src/inference
+  workflow_dispatch
+
 
 jobs:
   new-canary:
