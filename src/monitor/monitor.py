@@ -7,7 +7,6 @@ import requests
 from kafka import KafkaConsumer
 
 from src import config
-from src.utils.email_notification import send_email
 from src.utils.process import check_movie_id, check_timestamp, check_user_id
 
 
@@ -96,7 +95,7 @@ class OnlineEvaluation:
                     if movie_id in user_recommendations:
                         self.recommended_watch_num[user_class] += 1
                         self.recommended_rank_sum[user_class] += (
-                                user_recommendations.index(movie_id) + 1
+                            user_recommendations.index(movie_id) + 1
                         )
                         self.recommended_watch_time[user_class] += 1
                         self.recommended_movie_length[user_class] += movie_length
@@ -129,7 +128,10 @@ class OnlineEvaluation:
                 return
 
         if parsed[2].find("recommendation request") != -1:
-            if self.num_of_recommendations[user_class] >= self.online_evaluation_threshold:
+            if (
+                self.num_of_recommendations[user_class]
+                >= self.online_evaluation_threshold
+            ):
                 return
             # Parse the movies so we only get the movies id
             movies_recommended = parsed[4:24]
@@ -281,7 +283,7 @@ class OnlineEvaluation:
     def compute_recommendation_watch_rate(self):
         watch_rate = []
         for watch_num, num_recommendation in zip(
-                self.recommended_watch_num, self.num_of_recommendations
+            self.recommended_watch_num, self.num_of_recommendations
         ):
             if num_recommendation == 0:
                 watch_rate.append(0)
@@ -295,7 +297,7 @@ class OnlineEvaluation:
     def compute_recommendation_accuracy(self):
         accuracy = []
         for positive_rating, rated in zip(
-                self.recommended_movies_positive_rating, self.total_recommendations_rated
+            self.recommended_movies_positive_rating, self.total_recommendations_rated
         ):
             if rated == 0:
                 accuracy.append(0)
@@ -311,7 +313,7 @@ class OnlineEvaluation:
     def compute_average_watch_time_proportion(self):
         time_proportion = []
         for watch_time, movie_length in zip(
-                self.recommended_watch_time, self.recommended_movie_length
+            self.recommended_watch_time, self.recommended_movie_length
         ):
             if movie_length == 0:
                 time_proportion.append(0)
@@ -325,7 +327,7 @@ class OnlineEvaluation:
     def compute_movie_watched_rank(self):
         rank = []
         for rank_sum, watch_num in zip(
-                self.recommended_rank_sum, self.recommended_watch_num
+            self.recommended_rank_sum, self.recommended_watch_num
         ):
             if watch_num == 0:
                 rank.append(0)
