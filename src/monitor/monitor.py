@@ -28,20 +28,20 @@ class OnlineEvaluation:
         self.online_evaluation_threshold = online_evaluation_threshold
         self.savedata = save
 
-        self.recommendations = [{} for _ in range(10)]
-        self.movie_watched_length = [multi_dict(3, str) for _ in range(10)]
+        self.recommendations = [{} for _ in range(2)]
+        self.movie_watched_length = [multi_dict(3, str) for _ in range(2)]
 
-        self.num_of_recommendations = [0 for _ in range(10)]
-        self.recommended_watch_num = [0 for _ in range(10)]
-        self.total_watch_num = [0 for _ in range(10)]
+        self.num_of_recommendations = [0 for _ in range(2)]
+        self.recommended_watch_num = [0 for _ in range(2)]
+        self.total_watch_num = [0 for _ in range(2)]
 
-        self.recommended_watch_time = [0 for _ in range(10)]
-        self.recommended_movie_length = [0 for _ in range(10)]
+        self.recommended_watch_time = [0 for _ in range(2)]
+        self.recommended_movie_length = [0 for _ in range(2)]
 
-        self.recommended_movies_positive_rating = [0 for _ in range(10)]
-        self.total_recommendations_rated = [0 for _ in range(10)]
+        self.recommended_movies_positive_rating = [0 for _ in range(2)]
+        self.total_recommendations_rated = [0 for _ in range(2)]
 
-        self.recommended_rank_sum = [0 for _ in range(10)]
+        self.recommended_rank_sum = [0 for _ in range(2)]
 
         self.setup_online_testing()
 
@@ -54,7 +54,10 @@ class OnlineEvaluation:
             return
 
         # user_class is defined as the last digit of the user id
-        user_class = int(user_id[-1])
+        if int(user_id[-1]) == 1 or int(user_id[-1]) == 2:
+            user_class = 0
+        else:
+            user_class = 1
 
         # If length is <= 3 then the request is either a /data/ or /rate/ request
 
@@ -93,7 +96,7 @@ class OnlineEvaluation:
                     if movie_id in user_recommendations:
                         self.recommended_watch_num[user_class] += 1
                         self.recommended_rank_sum[user_class] += (
-                            user_recommendations.index(movie_id) + 1
+                                user_recommendations.index(movie_id) + 1
                         )
                         self.recommended_watch_time[user_class] += 1
                         self.recommended_movie_length[user_class] += movie_length
@@ -126,22 +129,14 @@ class OnlineEvaluation:
                 return
 
         if parsed[2].find("recommendation request") != -1:
-            # check the status of the response
-            status = parsed[3]
-            if status == "status 200":
-                if self.num_of_recommendations >= self.online_evaluation_threshold:
-                    return
-                # Parse the movies so we only get the movies id
-                movies_recommended = parsed[4:24]
-                movies_recommended[0] = movies_recommended[0].replace("result: ", "")
-                movies_recommended = [s.strip() for s in movies_recommended]
-                self.recommendations[user_class][user_id] = movies_recommended
-                self.num_of_recommendations[user_class] += 1
-            else:
-                send_email(
-                    "[COMP585] Recommendation failed",
-                    "The system returned a status != 200 for a recommendation request",
-                )
+            if self.num_of_recommendations[user_class] >= self.online_evaluation_threshold:
+                return
+            # Parse the movies so we only get the movies id
+            movies_recommended = parsed[4:24]
+            movies_recommended[0] = movies_recommended[0].replace("result: ", "")
+            movies_recommended = [s.strip() for s in movies_recommended]
+            self.recommendations[user_class][user_id] = movies_recommended
+            self.num_of_recommendations[user_class] += 1
         return
 
     def write_metrics(self, timestamp):
@@ -286,7 +281,7 @@ class OnlineEvaluation:
     def compute_recommendation_watch_rate(self):
         watch_rate = []
         for watch_num, num_recommendation in zip(
-            self.recommended_watch_num, self.num_of_recommendations
+                self.recommended_watch_num, self.num_of_recommendations
         ):
             if num_recommendation == 0:
                 watch_rate.append(0)
@@ -300,7 +295,7 @@ class OnlineEvaluation:
     def compute_recommendation_accuracy(self):
         accuracy = []
         for positive_rating, rated in zip(
-            self.recommended_movies_positive_rating, self.total_recommendations_rated
+                self.recommended_movies_positive_rating, self.total_recommendations_rated
         ):
             if rated == 0:
                 accuracy.append(0)
@@ -316,7 +311,7 @@ class OnlineEvaluation:
     def compute_average_watch_time_proportion(self):
         time_proportion = []
         for watch_time, movie_length in zip(
-            self.recommended_watch_time, self.recommended_movie_length
+                self.recommended_watch_time, self.recommended_movie_length
         ):
             if movie_length == 0:
                 time_proportion.append(0)
@@ -330,7 +325,7 @@ class OnlineEvaluation:
     def compute_movie_watched_rank(self):
         rank = []
         for rank_sum, watch_num in zip(
-            self.recommended_rank_sum, self.recommended_watch_num
+                self.recommended_rank_sum, self.recommended_watch_num
         ):
             if watch_num == 0:
                 rank.append(0)
@@ -394,20 +389,20 @@ class OnlineEvaluation:
         # self.total_recommendations_rated = 0
         #
         # self.recommended_rank_sum = 0
-        self.recommendations = [{} for _ in range(10)]
-        self.movie_watched_length = [multi_dict(3, str) for _ in range(10)]
+        self.recommendations = [{} for _ in range(2)]
+        self.movie_watched_length = [multi_dict(3, str) for _ in range(2)]
 
-        self.num_of_recommendations = [0 for _ in range(10)]
-        self.recommended_watch_num = [0 for _ in range(10)]
-        self.total_watch_num = [0 for _ in range(10)]
+        self.num_of_recommendations = [0 for _ in range(2)]
+        self.recommended_watch_num = [0 for _ in range(2)]
+        self.total_watch_num = [0 for _ in range(2)]
 
-        self.recommended_watch_time = [0 for _ in range(10)]
-        self.recommended_movie_length = [0 for _ in range(10)]
+        self.recommended_watch_time = [0 for _ in range(2)]
+        self.recommended_movie_length = [0 for _ in range(2)]
 
-        self.recommended_movies_positive_rating = [0 for _ in range(10)]
-        self.total_recommendations_rated = [0 for _ in range(10)]
+        self.recommended_movies_positive_rating = [0 for _ in range(2)]
+        self.total_recommendations_rated = [0 for _ in range(2)]
 
-        self.recommended_rank_sum = [0 for _ in range(10)]
+        self.recommended_rank_sum = [0 for _ in range(2)]
 
     def setup_online_testing(self):
         server, topic = "fall2022-comp585.cs.mcgill.ca:9092", "movielog5"
