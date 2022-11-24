@@ -9,6 +9,7 @@ MODELS_FOLDER = "models"
 MODEL_NAME = "model.pt"
 MOVIE_MAP = "movie_map.csv"
 INTERACTIONS = "interactions.csv"
+NEWINTERACTIONS = "new_interactions.csv"
 KAFKA_DUMP = "kafka-dump.csv"
 VERIFIED_MOVIES = "verified_movie.csv"
 

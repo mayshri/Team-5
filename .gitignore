@@ -201,3 +201,4 @@ deployed_models/live/models/model.pt
 deployed_models/live/models/movie_map.csv
 deployed_models/live/models/verified_movie.csv
 src/middleware/SENDGRID_API_KEY.txt
+models/new_interactions.csv

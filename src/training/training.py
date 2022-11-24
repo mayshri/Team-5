@@ -3,16 +3,19 @@ import os
 import time
 from threading import Timer
 
+import pandas as pd
+
 from src import config
 from src.inference.model import Model
 from src.utils.github import GithubClient
 
 
 class AutoTraining:
-    def __init__(self, train_period: int, instant_update=False):
+    def __init__(self, train_period: int, max_interactions: int, instant_update=False):
         self.train_period = train_period
         self.github = GithubClient()
         self.last_train_time = time.time()
+        self.max_interactions = max_interactions
 
         if instant_update:
             self.model_training()
@@ -20,8 +23,23 @@ class AutoTraining:
 
         self.set_up_autotraining()
 
-    @staticmethod
-    def model_training():
+    def model_training(self):
+        new_interactions_df = pd.read_csv(config.GIT_MODEL / config.NEWINTERACTIONS)
+        data = {"timestamp": [], "user_id": [], "movie_id": []}
+        refresh_new_interactions_df = pd.DataFrame(data)
+        refresh_new_interactions_df.to_csv(config.GIT_MODEL / config.NEWINTERACTIONS, index=False)
+        existing_interactions_df = pd.read_csv(config.GIT_MODEL / config.INTERACTIONS)
+        interactions_df = pd.concat(
+            [existing_interactions_df, new_interactions_df], ignore_index=True
+        )
+        interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
+        interactions_df = interactions_df[
+            pd.to_numeric(interactions_df["user_id"], errors="coerce").notnull()
+        ]
+        overflow = interactions_df.shape[0] - self.max_interactions
+        if overflow > 0:
+            interactions_df = interactions_df.iloc[overflow:]
+        interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
         os.remove(config.GIT_MODEL / config.MOVIE_MAP)
         model = Model(config.GIT_MODEL, recompute_movie_map=True)
         train, _ = model.load_interactions()
@@ -62,4 +80,4 @@ class AutoTraining:
 
 
 if __name__ == "__main__":
-    AutoTraining(7020, True)
+    AutoTraining(86400, 10000000, False)

@@ -27,6 +27,8 @@ def response(userid: str):
         try:
             return canary_model.recommend(int(userid))
         except Exception:
+            # abort canary here
+            # send email
             return live_model.recommend(int(userid))
     else:
         return live_model.recommend(int(userid))
