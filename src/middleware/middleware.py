@@ -1,12 +1,9 @@
 import requests
-import sendgrid
+from src.utils.email_notification import send_email
 from flask import Flask
-from sendgrid.helpers.mail import Mail
 from wrapt_timeout_decorator import timeout
 
 app = Flask(__name__)
-with open("/middleware/SENDGRID_API_KEY.txt", "r") as f:
-    key = f.readline()
 
 
 @app.route("/recommend/<userid>")
@@ -36,7 +33,7 @@ def response(userid: str):
         # send email here
         send_email(
             "[COMP585] Middleware ultimate backup plan triggered",
-            "Middleware ultimate backup plan triggered!!!",
+            "Middleware ultimate backup plan triggered!!! Time out!",
         )
         return (
             "the+shawshank+redemption+1994,interstellar+2014,"
@@ -52,29 +49,11 @@ def response(userid: str):
         )
 
 
-@timeout(0.3)
+@timeout(0.4)
 def ask_inference(userid: str):
     reply = requests.get("http://inference:5001/recommend/" + userid)
     content, status_code = reply.content, reply.status_code
     return content, status_code
 
 
-def send_email(subject: str, html_content: str):
-    message = Mail(
-        from_email="yuanye20001205@outlook.com",
-        to_emails=[
-            "ye.yuan3@mail.mcgill.ca",
-            "arthur.monnier@mail.mcgill.ca",
-            "mayank.shrivastava@mail.mcgill.ca",
-            "gabriel.tseng@mail.mcgill.ca",
-            "qihan.wu@mail.mcgill.ca",
-        ],
-        subject=subject,
-        html_content=html_content,
-    )
-    api_key = key
-    sg = sendgrid.SendGridAPIClient(api_key=api_key)
-    response = sg.send(message)
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
+

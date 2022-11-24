@@ -1,20 +1,22 @@
 services:
   middleware:
     container_name: middleware
-    image: middleware
+    image: dependency
     build:
-      context: /home/team-5/Team-5/src/middleware
-      dockerfile: middleware.Dockerfile
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - inference
     ports:
       - 8081:8081
     volumes:
-      - /home/team-5/Team-5/src/middleware:/middleware
+      - /home/team-5/Team-5:/Team-5
     networks:
       - testnetwork
     deploy:
       restart_policy:
         condition: on-failure
-    command: python3 -m flask --app middleware.py run --host=0.0.0.0 --port=8081
+    command: python3 -m flask --app middleware/middleware.py run --host=0.0.0.0 --port=8081
 
   inference:
     container_name: inference
@@ -84,14 +86,14 @@ services:
       restart_policy:
         condition: on-failure
     command: python3 monitor/availability.py
-
-  grafana:
-    container_name: grafana
-    image: grafana/grafana-enterprise
-    ports:
-      - 3000:3000
-    networks:
-      - testnetwork
+  
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana-enterprise
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - testnetwork
       
 networks:
   testnetwork:
