@@ -12,6 +12,10 @@ INTERACTIONS = "interactions.csv"
 NEWINTERACTIONS = "new_interactions.csv"
 KAFKA_DUMP = "kafka-dump.csv"
 VERIFIED_MOVIES = "verified_movie.csv"
+CANARY_LOG = "canary_log.txt"
+LIVE_LOG = "live_log.txt"
+CANARY = "canary"
+LIVE = "live"
 
 GIT_MODEL = Path(__file__).parents[1] / MODELS_FOLDER
 

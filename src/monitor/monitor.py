@@ -84,7 +84,7 @@ class OnlineEvaluation:
                     if movie_id in user_recommendations:
                         self.recommended_watch_num += 1
                         self.recommended_rank_sum += (
-                                user_recommendations.index(movie_id) + 1
+                            user_recommendations.index(movie_id) + 1
                         )
                         self.recommended_watch_time += 1
                         self.recommended_movie_length += movie_length
@@ -182,7 +182,7 @@ class OnlineEvaluation:
         if self.total_recommendations_rated == 0:
             return 0
         return (
-                self.recommended_movies_positive_rating / self.total_recommendations_rated
+            self.recommended_movies_positive_rating / self.total_recommendations_rated
         )
 
     def compute_average_watch_time_proportion(self):
@@ -259,5 +259,5 @@ class OnlineEvaluation:
                 self.reset()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     OnlineEvaluation(14400, 1000)

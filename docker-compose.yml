@@ -28,9 +28,9 @@ services:
       - /home/team-5/Team-5:/Team-5
     networks:
       - testnetwork
-    deploy:
-      restart_policy:
-        condition: on-failure
+    #deploy:
+      #restart_policy:
+        #condition: on-failure
     command: python3 -m flask --app inference/app.py run --host=0.0.0.0 --port=5001
 
   datacollector:
@@ -58,6 +58,19 @@ services:
       restart_policy:
         condition: on-failure
     command: python3 training/training.py
+  
+  monitor:
+    container_name: monitor
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 monitor/monitor.py
 
   availability:
     container_name: availability
@@ -71,14 +84,6 @@ services:
       restart_policy:
         condition: on-failure
     command: python3 monitor/availability.py
-
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus
-    ports:
-      - 9090:9090
-    networks:
-      - testnetwork
 
   grafana:
     container_name: grafana

@@ -63,6 +63,10 @@ def send_email(subject: str, html_content: str):
     message = Mail(
         from_email="yuanye20001205@outlook.com",
         to_emails=[
+            "ye.yuan3@mail.mcgill.ca",
+            "arthur.monnier@mail.mcgill.ca",
+            "mayank.shrivastava@mail.mcgill.ca",
+            "gabriel.tseng@mail.mcgill.ca",
             "qihan.wu@mail.mcgill.ca",
         ],
         subject=subject,
