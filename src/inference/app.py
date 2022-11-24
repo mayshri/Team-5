@@ -10,8 +10,8 @@ canary_model = Model(config.CANARY_MODEL)
 # record the restart time stamp here.
 
 
-@app.route("/new_model_arrived")
-def reload():
+@app.route("/new_model_arrived/<commit_id>")
+def reload(commit_id):
     try:
         live_model.reload()
         canary_model.reload()

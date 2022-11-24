@@ -18,7 +18,7 @@ def multi_dict(n, type):
 
 
 class OnlineEvaluation:
-    def __init__(self, timeinterval, online_evaluation_threshold, save=True):
+    def __init__(self, timeinterval, online_evaluation_threshold,test_round, save=True):
 
         self.timeinterval = timeinterval
         self.timestamp = int(time.time())
@@ -26,6 +26,7 @@ class OnlineEvaluation:
         # user_class is defined as the last digit of the user id
         self.online_evaluation_threshold = online_evaluation_threshold
         self.savedata = save
+        self.test_round = test_round
 
         self.recommendations = [{} for _ in range(2)]
         self.movie_watched_length = [multi_dict(3, str) for _ in range(2)]
@@ -240,46 +241,6 @@ class OnlineEvaluation:
                 + "\n"
             )
 
-    def print_temp_metrics(self, timestamp):
-        # Write the metrics to a file
-        print("Watch rate: ", str(self.compute_recommendation_watch_rate()))
-        print(
-            "Average Watch rate: ", str(mean(self.compute_recommendation_watch_rate()))
-        )
-
-        print("Good rating percentage", str(self.compute_recommendation_accuracy()))
-        print(
-            "Average Good rating percentage",
-            str(mean(self.compute_recommendation_accuracy())),
-        )
-
-        print(
-            "Watch time proportion: ",
-            str(self.compute_average_watch_time_proportion()),
-        )
-        print(
-            "Average watch time proportion: ",
-            str(mean(self.compute_average_watch_time_proportion())),
-        )
-
-        print(
-            "Rank of recommended movie watched: ",
-            str(self.compute_movie_watched_rank()),
-        )
-        print(
-            "Average rank of recommended movie watched: ",
-            str(mean(self.compute_movie_watched_rank())),
-        )
-
-        print(
-            "Recommended watched by total watched:",
-            str(self.compute_recommended_watched_by_total_watched()),
-        )
-        print(
-            "Average recommended watched by total watched:",
-            str(mean(self.compute_recommended_watched_by_total_watched())),
-        )
-
     def compute_recommendation_watch_rate(self):
         watch_rate = []
         for watch_num, num_recommendation in zip(
@@ -290,9 +251,6 @@ class OnlineEvaluation:
             else:
                 watch_rate.append(watch_num / num_recommendation)
         return watch_rate
-        # if self.num_of_recommendations == 0:
-        #     return 0
-        # return self.recommended_watch_num / self.num_of_recommendations
 
     def compute_recommendation_accuracy(self):
         accuracy = []
@@ -304,11 +262,6 @@ class OnlineEvaluation:
             else:
                 accuracy.append(positive_rating / rated)
         return accuracy
-        # if self.total_recommendations_rated == 0:
-        #     return 0
-        # return (
-        #     self.recommended_movies_positive_rating / self.total_recommendations_rated
-        # )
 
     def compute_average_watch_time_proportion(self):
         time_proportion = []
@@ -320,9 +273,6 @@ class OnlineEvaluation:
             else:
                 time_proportion.append(watch_time / movie_length)
         return time_proportion
-        # if self.recommended_movie_length == 0:
-        #     return 0
-        # return self.recommended_watch_time / self.recommended_movie_length
 
     def compute_movie_watched_rank(self):
         rank = []
@@ -334,9 +284,6 @@ class OnlineEvaluation:
             else:
                 rank.append(rank_sum / watch_num)
         return rank
-        # if self.recommended_watch_num == 0:
-        #     return 0
-        # return self.recommended_rank_sum / self.recommended_watch_num
 
     def compute_recommended_watched_by_total_watched(self):
         total_watched = []
@@ -346,51 +293,8 @@ class OnlineEvaluation:
             else:
                 total_watched.append(recommended / total)
         return total_watched
-        # if self.total_watch_num == 0:
-        #     return 0
-        # return self.recommended_watch_num / self.total_watch_num
-
-    def save_telemetry(self):
-        data = {
-            "recommendations": [],
-            "recommended_watch_num": [],
-            "num_of_recommendations": [],
-            "recommended_movies_positive_rating": [],
-            "total_recommendations_rated": [],
-            "recommended_watch_time": [],
-            "recommended_movie_length": [],
-            "total_watch_num": [],
-            "recommended_rank_sum": [],
-        }
-        data["recommendations"].append(self.recommendations)
-        data["recommended_watch_num"].append(self.recommended_watch_num)
-        data["num_of_recommendations"].append(self.num_of_recommendations)
-        data["recommended_movies_positive_rating"].append(
-            self.recommended_movies_positive_rating
-        )
-        data["total_recommendations_rated"].append(self.total_recommendations_rated)
-        data["recommended_watch_time"].append(self.recommended_watch_time)
-        data["recommended_movie_length"].append(self.recommended_movie_length)
-        data["total_watch_num"].append(self.total_watch_num)
-        data["recommended_rank_sum"].append(self.recommended_rank_sum)
-        with open(config.TELEMETRYPATH, "w") as f:
-            json.dump(data, f)
 
     def reset(self):
-        # self.recommendations = {}
-        # self.movie_watched_length = multi_dict(3, str)
-        #
-        # self.num_of_recommendations = 0
-        # self.recommended_watch_num = 0
-        # self.total_watch_num = 0
-        #
-        # self.recommended_watch_time = 0
-        # self.recommended_movie_length = 0
-        #
-        # self.recommended_movies_positive_rating = 0
-        # self.total_recommendations_rated = 0
-        #
-        # self.recommended_rank_sum = 0
         self.recommendations = [{} for _ in range(2)]
         self.movie_watched_length = [multi_dict(3, str) for _ in range(2)]
 
