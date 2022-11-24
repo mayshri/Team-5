@@ -59,6 +59,19 @@ services:
         condition: on-failure
     command: python3 training/training.py
 
+  availability:
+    container_name: availability
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 monitor/availability.py
+
     #monitoring&grafana not ready
       
 networks:

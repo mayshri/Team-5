@@ -27,4 +27,4 @@ def send_email(subject: str, html_content: str):
         print(response.body)
         print(response.headers)
     except Exception:
-        print("Got an Exception!")
+        print("Send email failed!")
