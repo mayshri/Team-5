@@ -27,12 +27,16 @@ class AutoTraining:
         new_interactions_df = pd.read_csv(config.GIT_MODEL / config.NEWINTERACTIONS)
         data = {"timestamp": [], "user_id": [], "movie_id": []}
         refresh_new_interactions_df = pd.DataFrame(data)
-        refresh_new_interactions_df.to_csv(config.GIT_MODEL / config.NEWINTERACTIONS, index=False)
+        refresh_new_interactions_df.to_csv(
+            config.GIT_MODEL / config.NEWINTERACTIONS, index=False
+        )
         existing_interactions_df = pd.read_csv(config.GIT_MODEL / config.INTERACTIONS)
         interactions_df = pd.concat(
             [existing_interactions_df, new_interactions_df], ignore_index=True
         )
-        interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
+        interactions_df.drop_duplicates(
+            subset=["user_id", "movie_id"], keep="last", inplace=True
+        )
         interactions_df = interactions_df[
             pd.to_numeric(interactions_df["user_id"], errors="coerce").notnull()
         ]
