@@ -1,10 +1,5 @@
 name: New canary
 on:
-  workflow_run:
-    workflows: ["CI"]
-    branches: [debug_deployment]
-    types: 
-      - completed
   push:
     branches:
     - debug_deployment
@@ -18,6 +13,14 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v2
+      - name: Wait for tests to succeed
+        uses: lewagon/wait-on-check-action@v1.2.0
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'CI'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 20
+
       - name: Create SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
