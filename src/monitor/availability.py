@@ -17,9 +17,10 @@ class Availability:
         ):
             if parsed[3].find("status 200") == -1:
                 send_email(
-                    "[COMP585] Recommendation failed",
-                    "The kafka stream shows status != 200 for a recommendation request!!!!!!!",
+                    "[COMP585] Recommendation failed status not 200",
+                    entry.value.decode("utf-8"),
                 )
+                print(entry.value.decode("utf-8"))
         return
 
     def monitor_availability(self):
