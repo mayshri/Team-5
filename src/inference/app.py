@@ -27,7 +27,9 @@ def reload(commit_id):
         g.canary_time = int(time.time())
         g.canary_id = commit_id
         with open(config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a") as f:
-            f.write(str(g.canary_time) + "," + str(commit_id) + ",new canary arrived")
+            f.write(
+                str(g.canary_time) + "," + str(commit_id) + ",new canary arrived" + "\n"
+            )
         return "reload success"
     except Exception:
         return "reload failed"
@@ -51,11 +53,19 @@ def response(userid: str):
                 config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
             ) as f:
                 f.write(
-                    str(time.time()) + "," + str(g.canary_id) + ",new canary released"
+                    str(time.time())
+                    + ","
+                    + str(g.canary_id)
+                    + ",new canary released"
+                    + "\n"
                 )
             with open(config.DEPLOYED_MODELS / config.LIVE / config.LIVE_LOG, "a") as f:
                 f.write(
-                    str(time.time()) + "," + str(g.canary_id) + ",new live deployed"
+                    str(time.time())
+                    + ","
+                    + str(g.canary_id)
+                    + ",new live deployed"
+                    + "\n"
                 )
             g.live_id = g.canary_id
             shutil.rmtree(config.LIVE_MODEL)
@@ -74,7 +84,13 @@ def response(userid: str):
             with open(
                 config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
             ) as f:
-                f.write(str(time.time()) + "," + str(g.canary_id) + ",new canary abort")
+                f.write(
+                    str(time.time())
+                    + ","
+                    + str(g.canary_id)
+                    + ",new canary abort"
+                    + "\n"
+                )
             g.canary_id = g.live_id
             # Delete the folder of current canary model
             shutil.rmtree(config.CANARY_MODEL)
