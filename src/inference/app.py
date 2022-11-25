@@ -47,7 +47,7 @@ def metric():
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
-    if int(time.time()) - g.canary_time > 86400:
+    if int(time.time()) - g.canary_time > 3600:
         if g.has_canary:
             with open(
                 config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"

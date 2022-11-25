@@ -251,7 +251,7 @@ class OnlineEvaluation:
 
         for message in consumer:
             self.parse_entry(message)
-            # track 1000 recommendations for 12 hours
+            # track 1000 recommendations for 4 hours
             if self.timestamp + self.timeinterval < int(time.time()):
                 self.timestamp = int(time.time())
                 if self.savedata:
