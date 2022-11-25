@@ -59,19 +59,12 @@ class AutoTraining:
                 ),
                 (config.GIT_MODEL / config.MODEL_NAME, config.MODEL_PATH, "base64"),
                 (config.GIT_MODEL / config.MOVIE_MAP, config.MOVIE_MAP_PATH, "utf-8"),
-                (
-                    config.GIT_MODEL / config.VERIFIED_MOVIES,
-                    config.VERIFIED_MOVIES_PATH,
-                    "utf-8",
-                ),
             ],
-            "[ONLINE TRAINING] Update Interactions / Model / Movie Map / Verified Movie - "
+            "[ONLINE TRAINING] Update Interactions / Model / Movie Map - "
             + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
 
-        print(
-            "Online Training: Updated Interactions / Model / Movie Map / Verified Movie"
-        )
+        print("Online Training: Updated Interactions / Model / Movie Map")
 
     def auto_retrain(self):
         self.model_training()
