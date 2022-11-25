@@ -1,0 +1,7 @@
+1669410600
+Watch rate: 0.731
+Good rating proportion: 0.8227272727272728
+Average watch time proportion: 0.8811701418734246
+Avg watch rank: 5.050615595075239
+recommended proportion in total watched: 0.5986895986895987
+ 

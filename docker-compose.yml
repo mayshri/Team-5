@@ -1,0 +1,101 @@
+services:
+  middleware:
+    container_name: middleware
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - inference
+    ports:
+      - 8082:8082
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    networks:
+      - testnetwork
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 -m flask --app middleware/middleware.py run --host=0.0.0.0 --port=8082
+
+  inference:
+    container_name: inference
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5001:5001
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    networks:
+      - testnetwork
+    #deploy:
+      #restart_policy:
+        #condition: on-failure
+    command: python3 -m flask --app inference/app.py run --host=0.0.0.0 --port=5001
+
+  datacollector:
+    container_name: datacollector
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 data_collector/data_collector.py
+
+  training:
+    container_name: training
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 training/training.py
+  
+  monitor:
+    container_name: monitor
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 monitor/monitor.py
+
+  availability:
+    container_name: availability
+    image: dependency
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /home/team-5/Team-5:/Team-5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: python3 monitor/availability.py
+  
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana-enterprise
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - testnetwork
+      
+networks:
+  testnetwork:
+    name: testnetwork
+    driver: bridge

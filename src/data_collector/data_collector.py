@@ -13,12 +13,11 @@ from src.utils.process import (
 
 
 class DataCollector:
-    def __init__(self, save_period, max_interactions):
+    def __init__(self, save_period):
         self.save_period = save_period
-        self.max_interactions = max_interactions
         self.entries = []
         self.last_save_time = time.time()
-        self.verified_movies = pd.read_csv(config.VERIFIED_MOVIES_PATH)[
+        self.verified_movies = pd.read_csv(config.GIT_MODEL / config.VERIFIED_MOVIES)[
             "movie_id"
         ].tolist()
         self.start_data_collector()
@@ -27,24 +26,26 @@ class DataCollector:
         new_interactions_df = pd.DataFrame(
             self.entries, columns=["timestamp", "user_id", "movie_id"]
         )
-        existing_interactions_df = pd.read_csv(config.GIT_MODEL / config.INTERACTIONS)
+        existing_interactions_df = pd.read_csv(
+            config.GIT_MODEL / config.NEWINTERACTIONS
+        )
 
         interactions_df = pd.concat(
             [existing_interactions_df, new_interactions_df], ignore_index=True
         )
-        interactions_df.drop_duplicates(subset=["user_id", "movie_id"], inplace=True)
+        interactions_df.drop_duplicates(
+            subset=["user_id", "movie_id"], keep="last", inplace=True
+        )
         interactions_df = interactions_df[
             pd.to_numeric(interactions_df["user_id"], errors="coerce").notnull()
         ]
-        # Handle the case where the number of interactions is too large
-        # by keeping only the most recent interactions
-        overflow = interactions_df.shape[0] - self.max_interactions
-        if overflow > 0:
-            interactions_df = interactions_df.iloc[overflow:]
-
-        interactions_df.to_csv(config.GIT_MODEL / config.INTERACTIONS, index=False)
+        interactions_df.to_csv(config.GIT_MODEL / config.NEWINTERACTIONS, index=False)
         new_verify_movie = pd.DataFrame({"movie_id": self.verified_movies})
-        new_verify_movie.to_csv(config.VERIFIED_MOVIES_PATH, index=False)
+        new_verify_movie = new_verify_movie.drop_duplicates()
+        new_verify_movie.to_csv(config.GIT_MODEL / config.VERIFIED_MOVIES, index=False)
+        self.verified_movies = pd.read_csv(config.GIT_MODEL / config.VERIFIED_MOVIES)[
+            "movie_id"
+        ].tolist()
         self.entries = []
         self.last_save_time = time.time()
 
@@ -83,4 +84,4 @@ class DataCollector:
 
 
 if __name__ == "__main__":
-    DataCollector(600, 10000000)
+    DataCollector(600)

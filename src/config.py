@@ -9,15 +9,20 @@ MODELS_FOLDER = "models"
 MODEL_NAME = "model.pt"
 MOVIE_MAP = "movie_map.csv"
 INTERACTIONS = "interactions.csv"
+NEWINTERACTIONS = "new_interactions.csv"
 KAFKA_DUMP = "kafka-dump.csv"
 VERIFIED_MOVIES = "verified_movie.csv"
+CANARY_LOG = "canary_log.txt"
+LIVE_LOG = "live_log.txt"
+CANARY = "canary"
+LIVE = "live"
 
 GIT_MODEL = Path(__file__).parents[1] / MODELS_FOLDER
 
 # !! if this changes, it needs to change in the deployment.yml as well
 DEPLOYED_MODELS = Path(__file__).parents[1] / "deployed_models"
-LIVE_MODEL = DEPLOYED_MODELS / "live"
-CANARY_MODEL = DEPLOYED_MODELS / "canary"
+LIVE_MODEL = DEPLOYED_MODELS / "live" / MODELS_FOLDER
+CANARY_MODEL = DEPLOYED_MODELS / "canary" / MODELS_FOLDER
 # !!
 
 METRICSFOLDER = Path(__file__).parents[1] / "metrics"
@@ -31,8 +36,9 @@ METRICFILE = METRICSFOLDER / "metrics.txt"
 TELEMETRYPATH = METRICSFOLDER / "telemetry.json"
 
 API_KEY = Path(__file__).parents[1] / "src" / "utils" / "SENDGRID_API_KEY.txt"
+GITHUB_TOKEN = Path(__file__).parents[1] / "src" / "utils" / "GITHUB_TOKEN.txt"
 
 INTERACTIONS_PATH = MODELS_FOLDER + "/" + INTERACTIONS
 MODEL_PATH = MODELS_FOLDER + "/" + MODEL_NAME
 MOVIE_MAP_PATH = MODELS_FOLDER + "/" + MOVIE_MAP
-VERIFIED_MOVIES_PATH = GIT_MODEL / VERIFIED_MOVIES
+VERIFIED_MOVIES_PATH = MODELS_FOLDER + "/" + VERIFIED_MOVIES

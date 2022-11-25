@@ -1,0 +1,5 @@
+docker build -f dependency.Dockerfile -t dependency .
+docker build -t service .
+docker run --name datacollector -it -v /home/team-5/Team-5:/Team-5 service python3 data_collector/data_collector.py
+docker run --name training -it -v /home/team-5/Team-5:/Team-5 service python3 training/training.py
+docker run --net testnetwork --name middleware -it -v /home/team-5/Team-5:/Team-5 -p 8081:8081/tcp service python3 -m flask --app middleware/middleware.py run --host=0.0.0.0 --port=8081

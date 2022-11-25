@@ -190,3 +190,11 @@ Pipfile
 Pipfile.lock
 data/kafka-dump.csv
 scripts/playground.py
+models/new_interactions.csv
+src/middleware/SENDGRID_API_KEY.txt
+src/utils/GITHUB_TOKEN.txt
+src/utils/SENDGRID_API_KEY.txt
+deployed_models/canary/models/*
+deployed_models/live/models/*
+models/*
+models/verified_movie.csv
