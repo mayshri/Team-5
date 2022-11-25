@@ -38,10 +38,10 @@ class GithubClient:
             )
             elements.append(element)
 
-        head_sha = self.repo.get_branch("debug_deployment").commit.sha
+        head_sha = self.repo.get_branch("main").commit.sha
         base_tree = self.repo.get_git_tree(sha=head_sha)
         tree = self.repo.create_git_tree(elements, base_tree)
         parent = self.repo.get_git_commit(sha=head_sha)
         commit = self.repo.create_git_commit(commit_msg, tree, [parent])
-        main_ref = self.repo.get_git_ref("heads/debug_deployment")
+        main_ref = self.repo.get_git_ref("heads/main")
         main_ref.edit(sha=commit.sha)
