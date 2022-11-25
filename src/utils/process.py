@@ -40,12 +40,7 @@ def check_movie_id(movie_id):
     if response.status_code != 200:
         return False
 
-    content = json.loads(response.content)
-
-    if (content["revenue"] <= 0) or (content["budget"] <= 0):
-        return False
-
-    imdb_id = content["imdb_id"]
+    imdb_id = json.loads(response.content)["imdb_id"]
     imdb_response = requests.get(f"https://www.imdb.com/title/{imdb_id}/")
     return imdb_response.status_code == 200
 
