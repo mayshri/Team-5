@@ -39,7 +39,7 @@ def metric():
         with open(config.METRICFILE, "r") as f:
             text = f.read()
         return Response(text, mimetype="text/plain")
-    except:
+    except Exception:
         return "exception displaying online evaluation"
 
 
