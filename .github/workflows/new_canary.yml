@@ -1,6 +1,10 @@
 name: New canary
-
 on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [debug_deployment]
+    types: 
+      - completed
   push:
     branches:
     - debug_deployment
