@@ -3,7 +3,7 @@ name: New canary
 on:
   push:
     branches:
-    - main
+    - debug_deployment
     paths:
     - models/model.pt
 
