@@ -1,5 +1,6 @@
 import csv
 import datetime
+import json
 import time
 from pathlib import Path
 from typing import Union
@@ -30,11 +31,19 @@ def check_user_id(user_id):
 
 
 def check_movie_id(movie_id):
+    """
+    True if the movie is real, False if it isn't
+    """
     try:
-        code = requests.get(
+        response = requests.get(
             "http://fall2022-comp585.cs.mcgill.ca:8080/movie/" + movie_id
-        ).status_code
-        return code == 200
+        )
+        if response.status_code != 200:
+            return False
+
+        imdb_id = json.loads(response.content)["imdb_id"]
+        imdb_response = requests.get(f"https://www.imdb.com/title/{imdb_id}/")
+        return imdb_response.status_code == 200
     except Exception:
         return False
 
