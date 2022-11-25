@@ -1,7 +1,8 @@
 import requests
-from src.utils.email_notification import send_email
 from flask import Flask
 from wrapt_timeout_decorator import timeout
+
+from src.utils.email_notification import send_email
 
 app = Flask(__name__)
 
@@ -54,6 +55,3 @@ def ask_inference(userid: str):
     reply = requests.get("http://inference:5001/recommend/" + userid)
     content, status_code = reply.content, reply.status_code
     return content, status_code
-
-
-

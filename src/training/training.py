@@ -84,4 +84,4 @@ class AutoTraining:
 
 
 if __name__ == "__main__":
-    AutoTraining(86400, 10000000, False)
+    AutoTraining(86400, 10000000, True)

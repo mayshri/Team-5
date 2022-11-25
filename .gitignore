@@ -196,3 +196,5 @@ src/utils/GITHUB_TOKEN.txt
 src/utils/SENDGRID_API_KEY.txt
 deployed_models/canary/models/*
 deployed_models/live/models/*
+models/*
+models/verified_movie.csv
