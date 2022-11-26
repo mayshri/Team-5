@@ -47,32 +47,32 @@ def metric():
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
-    if int(time.time()) - g.canary_time > 3600:
-        if g.has_canary:
-            with open(
-                config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
-            ) as f:
-                f.write(
-                    str(time.time())
-                    + ","
-                    + str(g.canary_id)
-                    + ",new canary released"
-                    + "\n"
-                )
-            with open(config.DEPLOYED_MODELS / config.LIVE / config.LIVE_LOG, "a") as f:
-                f.write(
-                    str(time.time())
-                    + ","
-                    + str(g.canary_id)
-                    + ",new live deployed"
-                    + "\n"
-                )
-            g.live_id = g.canary_id
-            shutil.rmtree(config.LIVE_MODEL)
-            # Copy the folder of current live model to canary model folder
-            shutil.copytree(config.CANARY_MODEL, config.LIVE_MODEL)
-            send_email(g.canary_id, "released")
-            g.has_canary = False
+    if int(time.time()) - g.canary_time > 3600 and g.has_canary:
+        with open(
+            config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
+        ) as f:
+            f.write(
+                str(time.time())
+                + ","
+                + str(g.canary_id)
+                + ",new canary released"
+                + "\n"
+            )
+        with open(config.DEPLOYED_MODELS / config.LIVE / config.LIVE_LOG, "a") as f:
+            f.write(
+                str(time.time())
+                + ","
+                + str(g.canary_id)
+                + ",new live deployed"
+                + "\n"
+            )
+        g.live_id = g.canary_id
+        shutil.rmtree(config.LIVE_MODEL)
+        # Copy the folder of current live model to canary model folder
+        shutil.copytree(config.CANARY_MODEL, config.LIVE_MODEL)
+        send_email(g.canary_id, "released")
+        live_model.reload()
+        g.has_canary = False
 
     if int(userid[-1]) <= 1:
         try:
@@ -99,6 +99,7 @@ def response(userid: str):
             # Reload
             canary_model.reload()
             send_email(g.canary_id, "aborted")
+            g.canary_id=g.live_id
             return live_model.recommend(int(userid))
     else:
         return live_model.recommend(int(userid))

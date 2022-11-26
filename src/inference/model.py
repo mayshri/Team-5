@@ -180,7 +180,7 @@ class Model:
             else:
                 movies = self.get_user_movies_watched(user_id)
                 return self._process_predictions(self.predict(movies, 20))
-        raise ModelNotAvailable
+        raise self.top_20
 
     def map_movie_id(self, movie_id):
         return self.movie_map[self.movie_map["movie_id"] == movie_id][
