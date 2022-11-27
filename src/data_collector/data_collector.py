@@ -13,14 +13,14 @@ from src.utils.process import (
 
 
 class DataCollector:
-    def __init__(self, save_period, max_interaction):
+    def __init__(self, save_period, max_interactions):
         self.save_period = save_period
         self.entries = []
         self.last_save_time = time.time()
         self.verified_movies = pd.read_csv(config.GIT_MODEL / config.VERIFIED_MOVIES)[
             "movie_id"
         ].tolist()
-        self.max_interaction = max_interaction
+        self.max_interactions = max_interactions
         self.start_data_collector()
 
     def save_entries(self):

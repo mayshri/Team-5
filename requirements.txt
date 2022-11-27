@@ -16,3 +16,4 @@ PyGithub
 sendgrid
 APScheduler==3.2
 wrapt_timeout_decorator
+flask_executor

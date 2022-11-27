@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
+    if not userid.isnumeric():
+        return return_deterministic()
     try:
         return ask_inference(userid)
     except Exception:
@@ -18,7 +20,7 @@ def response(userid: str):
         return return_deterministic()
 
 
-@timeout(0.35)
+@timeout(0.4)
 def ask_inference(userid: str):
     reply = requests.get("http://inference:8083/recommend/" + userid)
     content, status_code = reply.content, reply.status_code
