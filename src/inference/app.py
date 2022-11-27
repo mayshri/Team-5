@@ -15,10 +15,13 @@ canary_model = Model(config.CANARY_MODEL)
 g = Recorder()
 
 # record the restart time stamp here.
+MODEL_RELOADING = False
 
 
 @app.route("/new_model_arrived/<commit_id>")
 def reload(commit_id):
+    global MODEL_RELOADING
+    MODEL_RELOADING = True
     try:
         live_model.reload()
         canary_model.reload()
@@ -30,6 +33,7 @@ def reload(commit_id):
             f.write(
                 str(g.canary_time) + "," + str(commit_id) + ",new canary arrived" + "\n"
             )
+        MODEL_RELOADING = False
         return "reload success"
     except Exception:
         return "reload failed"
@@ -47,40 +51,8 @@ def metric():
 
 @app.route("/recommend/<userid>")
 def response(userid: str):
-    if int(time.time()) - g.canary_time > 3600 and g.has_canary:
-        with open(
-            config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
-        ) as f:
-            f.write(
-                str(time.time())
-                + ","
-                + str(g.canary_id)
-                + ",new canary released"
-                + "\n"
-            )
-        with open(config.DEPLOYED_MODELS / config.LIVE / config.LIVE_LOG, "a") as f:
-            f.write(
-                str(time.time())
-                + ","
-                + str(g.canary_id)
-                + ",new live deployed"
-                + "\n"
-            )
-        g.live_id = g.canary_id
-        shutil.rmtree(config.LIVE_MODEL)
-        # Copy the folder of current live model to canary model folder
-        shutil.copytree(config.CANARY_MODEL, config.LIVE_MODEL)
-        send_email(g.canary_id, "released")
-        live_model.reload()
-        g.has_canary = False
-
-    if int(userid[-1]) <= 1:
-        try:
-            return canary_model.recommend(int(userid))
-        except Exception:
-            # abort canary here
-            # send email
-            g.has_canary = False
+    if not MODEL_RELOADING:
+        if int(time.time()) - g.canary_time > 3600 and g.has_canary:
             with open(
                 config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
             ) as f:
@@ -88,18 +60,51 @@ def response(userid: str):
                     str(time.time())
                     + ","
                     + str(g.canary_id)
-                    + ",new canary abort"
+                    + ",new canary released"
                     + "\n"
                 )
-            g.canary_id = g.live_id
-            # Delete the folder of current canary model
-            shutil.rmtree(config.CANARY_MODEL)
+            with open(config.DEPLOYED_MODELS / config.LIVE / config.LIVE_LOG, "a") as f:
+                f.write(
+                    str(time.time())
+                    + ","
+                    + str(g.canary_id)
+                    + ",new live deployed"
+                    + "\n"
+                )
+            g.live_id = g.canary_id
+            shutil.rmtree(config.LIVE_MODEL)
             # Copy the folder of current live model to canary model folder
-            shutil.copytree(config.LIVE_MODEL, config.CANARY_MODEL)
-            # Reload
-            canary_model.reload()
-            send_email(g.canary_id, "aborted")
-            g.canary_id=g.live_id
+            shutil.copytree(config.CANARY_MODEL, config.LIVE_MODEL)
+            send_email(g.canary_id, "released")
+            live_model.reload()
+            g.has_canary = False
+
+        if int(userid[-1]) <= 1:
+            try:
+                return canary_model.recommend(int(userid))
+            except Exception:
+                # abort canary here
+                # send email
+                g.has_canary = False
+                with open(
+                    config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
+                ) as f:
+                    f.write(
+                        str(time.time())
+                        + ","
+                        + str(g.canary_id)
+                        + ",new canary abort"
+                        + "\n"
+                    )
+                g.canary_id = g.live_id
+                # Delete the folder of current canary model
+                shutil.rmtree(config.CANARY_MODEL)
+                # Copy the folder of current live model to canary model folder
+                shutil.copytree(config.LIVE_MODEL, config.CANARY_MODEL)
+                # Reload
+                canary_model.reload()
+                send_email(g.canary_id, "aborted")
+                g.canary_id = g.live_id
+                return live_model.recommend(int(userid))
+        else:
             return live_model.recommend(int(userid))
-    else:
-        return live_model.recommend(int(userid))

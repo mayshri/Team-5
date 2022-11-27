@@ -8,9 +8,9 @@ app = Flask(__name__)
 @app.route("/recommend/<userid>")
 def response(userid: str):
     if not userid.isnumeric():
-        return "invalid user",404
-    if int(userid)<=0 or int(userid) >1000000:
-        return "invalid user",404
+        return "invalid user", 404
+    if int(userid) <= 0 or int(userid) > 1000000:
+        return "invalid user", 404
     try:
         content, status_code = ask_inference(userid)
         if status_code == 200:
