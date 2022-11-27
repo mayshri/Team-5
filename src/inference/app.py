@@ -10,8 +10,6 @@ from src.inference.model import Model
 from src.inference.recorder import Recorder
 from src.utils.email_notification import send_email
 
-executor = ThreadPoolExecutor(1)
-
 app = Flask(__name__)
 
 live_model = Model(config.LIVE_MODEL)
