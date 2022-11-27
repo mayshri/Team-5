@@ -32,6 +32,7 @@ def ask_inference(userid: str):
         print("failed")
         return return_deterministic()
 
+
 def return_deterministic():
     return (
         "the+shawshank+redemption+1994,interstellar+2014,"
