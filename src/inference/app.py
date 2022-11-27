@@ -1,6 +1,5 @@
 import shutil
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 from flask import Flask, Response
 from flask_executor import Executor
