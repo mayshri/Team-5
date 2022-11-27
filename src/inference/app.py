@@ -26,13 +26,13 @@ def reload(commit_id):
         live_model.reload()
         canary_model.reload()
         # record reload here
-        g.has_canary = True
         g.canary_time = int(time.time())
         g.canary_id = commit_id
         with open(config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a") as f:
             f.write(
                 str(g.canary_time) + "," + str(commit_id) + ",new canary arrived" + "\n"
             )
+        g.has_canary = True
         MODEL_RELOADING = False
         return "reload success"
     except Exception:
@@ -79,12 +79,13 @@ def response(userid: str):
             live_model.reload()
             g.has_canary = False
 
-        if int(userid[-1]) <= 1:
-            try:
-                return canary_model.recommend(int(userid))
-            except Exception:
-                # abort canary here
-                # send email
+    if int(userid[-1]) <= 1:
+        try:
+            return canary_model.recommend(int(userid))
+        except Exception:
+            # abort canary here
+            # send email
+            if not MODEL_RELOADING:
                 g.has_canary = False
                 with open(
                     config.DEPLOYED_MODELS / config.CANARY / config.CANARY_LOG, "a"
@@ -105,6 +106,6 @@ def response(userid: str):
                 canary_model.reload()
                 send_email(g.canary_id, "aborted")
                 g.canary_id = g.live_id
-                return live_model.recommend(int(userid))
-        else:
             return live_model.recommend(int(userid))
+    else:
+        return live_model.recommend(int(userid))

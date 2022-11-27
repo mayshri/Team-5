@@ -13,13 +13,14 @@ from src.utils.process import (
 
 
 class DataCollector:
-    def __init__(self, save_period):
+    def __init__(self, save_period,max_interaction):
         self.save_period = save_period
         self.entries = []
         self.last_save_time = time.time()
         self.verified_movies = pd.read_csv(config.GIT_MODEL / config.VERIFIED_MOVIES)[
             "movie_id"
         ].tolist()
+        self.max_interaction=max_interaction
         self.start_data_collector()
 
     def save_entries(self):
@@ -39,6 +40,10 @@ class DataCollector:
         interactions_df = interactions_df[
             pd.to_numeric(interactions_df["user_id"], errors="coerce").notnull()
         ]
+        overflow = interactions_df.shape[0] - self.max_interactions
+        if overflow > 0:
+            interactions_df = interactions_df.iloc[overflow:]
+
         interactions_df.to_csv(config.GIT_MODEL / config.NEWINTERACTIONS, index=False)
         new_verify_movie = pd.DataFrame({"movie_id": self.verified_movies})
         new_verify_movie = new_verify_movie.drop_duplicates()
@@ -84,4 +89,4 @@ class DataCollector:
 
 
 if __name__ == "__main__":
-    DataCollector(600)
+    DataCollector(600,1000000)
